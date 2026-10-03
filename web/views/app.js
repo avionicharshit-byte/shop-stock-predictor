@@ -26,6 +26,7 @@
     busy: false,
     questions: [],
     lastSample: false,
+    resultSample: false,
     jobId: null,
     result: null,
     lines: [],
@@ -96,7 +97,7 @@
     var now = new Date();
     var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     setLeaf('today-', today);
-    $('today-name').textContent = EN_DAYS[today.getDay()] + ', ' + today.getDate() + ' ' + EN_MONTHS[today.getMonth()] + ' ' + today.getFullYear();
+    $('today-date').textContent = EN_DAYS[today.getDay()] + ', ' + today.getDate() + ' ' + EN_MONTHS[today.getMonth()] + ' ' + today.getFullYear();
     setLeaf('prev-', addDays(today, -1));
     var prev = document.querySelector('.prev');
     if (prev) prev.addEventListener('animationend', function () { prev.remove(); });
@@ -391,7 +392,9 @@
     var week = [];
     for (var i = 0; i < 7; i++) week.push(addDays(start, i));
     var end = week[6];
-    $('week-stamp').textContent = 'Week of ' + short(start) + ' to ' + short(end) + ', the 7 days after your last sale';
+    $('week-stamp').textContent = 'Week of ' + short(start) + ' to ' + short(end) + ', the 7 days after ' +
+      (state.resultSample ? "the sample's last sale" : 'your last sale');
+    $('sample-stamp').hidden = !state.resultSample;
 
     var byDay = {};
     var gone = [];
@@ -406,6 +409,7 @@
     // the earliest run-out day among items still on the shelf
     var earliest = null;
     week.forEach(function (date) { if (!earliest && byDay[dayKey(date)]) earliest = dayKey(date); });
+    state.firstIndex = earliest ? byDay[earliest][0] : (gone.length ? gone[0] : null);
 
     var goneBox = $('gone'), goneList = $('gone-list');
     goneList.textContent = '';
@@ -454,17 +458,21 @@
     say.textContent = '';
     var total = state.result.plan.length;
     if (!total) {
-      say.appendChild(el('strong', { text: 'Nothing to order this week. ' }));
-      say.appendChild(document.createTextNode('Every checked item has enough stock for the next 7 days.'));
+      say.appendChild(el('p', { class: 'say-big', text: 'Nothing to order this week.' }));
+      say.appendChild(el('p', { class: 'say-small', text: 'Every checked item has enough stock for the next 7 days.' }));
       return;
     }
-    say.appendChild(document.createTextNode('Gemma worded ' + state.wordedByAi + ' of ' + total + ' lines. The rest are the plain sentence. '));
+    // the first run-out item's sentence, in the language shown
+    var first = state.firstIndex === null || state.firstIndex === undefined ? 0 : state.firstIndex;
+    say.appendChild(el('p', { class: 'say-big', lang: LANG_ATTR[state.linesLanguage] || 'en', text: state.lines[first] || '' }));
+    var small = el('p', { class: 'say-small' }, ['Gemma worded ' + state.wordedByAi + ' of ' + total + ' lines. The rest are the plain sentence.']);
     if (state.linesByAi.length === total) {
-      say.appendChild(el('span', { class: 'legends' }, [
+      small.appendChild(el('span', { class: 'legends' }, [
         el('span', { class: 'legend' }, [penIcon(), ' worded by Gemma']),
         el('span', { class: 'legend' }, [plainIcon(), ' plain sentence'])
       ]));
     }
+    say.appendChild(small);
   }
 
   // ---------- small print under the week ----------
@@ -523,6 +531,7 @@
       var qty = el('input', { type: 'number', class: 'qty', id: qtyId, min: '0', step: '1', inputmode: 'numeric',
         value: String(line.order_units), 'aria-label': 'Quantity of ' + line.item + ', in pieces' });
       var row = el('tr', null, [
+        el('td', { class: 'ncell', text: String(i + 1) }),
         el('td', null, [el('label', { class: 'tick-hit', for: tickId }, [tick])]),
         el('td', { class: 'it' }, [line.item, el('small', { text: line.already_out ? 'Already finished' :
           'Runs out ' + EN_DAYS[parseDay(line.runs_out_on).getDay()] + ' ' + short(parseDay(line.runs_out_on)) +
@@ -533,6 +542,7 @@
       qty.addEventListener('input', refreshOrderButtons);
       body.appendChild(row);
     });
+    $('order-date').textContent = today.getDate() + ' ' + EN_MONTHS[today.getMonth()] + ' ' + today.getFullYear();
     $('shop-name').value = r.shop_name || '';
     $('out-status').textContent = '';
     $('fallback').hidden = true;
@@ -563,7 +573,8 @@
   function resetCopy() {
     var copy = $('copy');
     copy.classList.remove('done');
-    copy.querySelector('span').textContent = 'Copy for WhatsApp';
+    copy.querySelector('.bl-hi').textContent = 'WhatsApp के लिए कॉपी करें';
+    copy.querySelector('.bl-en').textContent = 'Copy for WhatsApp';
   }
 
   function post(url, body) {
@@ -591,7 +602,8 @@
     }).then(function (text) {
       var done = function () {
         copy.classList.add('done');
-        copy.querySelector('span').textContent = 'Copied';
+        copy.querySelector('.bl-hi').textContent = 'कॉपी हो गया';
+        copy.querySelector('.bl-en').textContent = 'Copied';
         $('out-status').textContent = 'Copied. Open WhatsApp and paste it to the supplier.';
         $('fallback').hidden = true;
         setTimeout(resetCopy, 4000);
@@ -709,6 +721,7 @@
 
   function showResult(result) {
     state.result = result;
+    state.resultSample = state.lastSample;
     state.lines = result.plan.map(function (line) { return line.line; });
     state.linesLanguage = result.language;
     state.linesByAi = result.plan.map(function (line) { return line.by_ai; });
@@ -783,11 +796,6 @@
     document.querySelectorAll('[data-limit="mb"]').forEach(function (node) {
       node.textContent = config.limits.max_upload_mb + ' MB';
     });
-    var server = $('server');
-    var gemma = config.gemma === 'off'
-      ? ' Gemma is off on this server, so every line is the plain sentence.'
-      : ' Gemma words the note' + (config.gemma === 'google' ? ' through Google.' : '.');
-    server.textContent = 'Checks at most ' + (items ? items + ' items' : 'every item') + ' per run, files up to ' + config.limits.max_upload_mb + ' MB each.' + gemma;
     if (config.tabpfn === 'off') {
       var go = $('go');
       go.classList.add('off');

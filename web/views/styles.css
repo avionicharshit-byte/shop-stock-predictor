@@ -241,18 +241,13 @@ svg { stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: square;
 .board a:hover { text-decoration-color: var(--ink); }
 .board :focus-visible { outline-color: var(--leaf); }
 
-.stub {
-  margin: 0 var(--inset); height: 16px; background: var(--leaf); position: relative;
-  border-left: 2px solid var(--ink); border-right: 2px solid var(--ink);
-  clip-path: polygon(0 0, 100% 0, 100% 62%, 98% 100%, 96% 55%, 93% 92%, 90% 48%, 87% 85%, 84% 52%, 80% 96%, 77% 58%, 73% 88%, 70% 50%, 66% 94%, 63% 56%, 59% 86%, 55% 52%, 52% 98%, 48% 60%, 45% 90%, 41% 50%, 38% 92%, 34% 56%, 30% 88%, 27% 50%, 23% 96%, 20% 58%, 16% 90%, 13% 52%, 9% 94%, 6% 56%, 3% 86%, 0 60%);
-}
 .staple {
   position: absolute; top: -9px; width: 46px; height: 7px; background: var(--ink); z-index: 2;
   border-top: 2px solid var(--leaf);
 }
 .staple.l { left: 18%; } .staple.r { right: 18%; }
 
-.leaf-wrap { margin: 0 var(--inset); position: relative; }
+.leaf-wrap { margin: 14px var(--inset) 0; position: relative; }
 .leaf-wrap::after {
   content: ''; display: block; height: 9px; margin: 0 4px;
   border: solid var(--ink); border-width: 0 1px 1px;
@@ -287,17 +282,13 @@ svg { stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: square;
   font-variant-numeric: lining-nums;
 }
 .weekday { margin: 0; padding-bottom: 6px; min-width: 0; }
-.weekday .aaj {
-  display: inline-block; margin-bottom: 14px; padding: 2px 10px 0; border: 1.5px solid var(--ink);
-  font-size: 16px; font-weight: 700; letter-spacing: 0.04em;
-}
-.weekday .aaj [lang="hi"] { font-weight: 700; margin-right: 4px; }
 .weekday .dev { font-family: var(--num); font-weight: 700; font-size: clamp(42px, 5.2vw, 76px); line-height: 1.05; display: block; }
 .weekday .lat { font-family: var(--num); font-weight: 700; font-stretch: 125%; font-variation-settings: 'wdth' 125; font-size: 26px; letter-spacing: 0.08em; display: block; margin-top: 6px; }
 .weekday .full { display: block; margin-top: 18px; font-size: 17px; border-top: 1px solid var(--ink); padding-top: 8px; }
+.weekday .full [lang="hi"] { font-weight: 700; }
 
 /* today's notes column holds the working action */
-form.check { padding: 26px 32px 24px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+form.check { padding: 24px 32px 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 
 .slot {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch;
@@ -381,7 +372,7 @@ form.check { padding: 26px 32px 24px; display: flex; flex-direction: column; gap
 .problem-text { color: var(--red); font-weight: 700; font-size: 19px; }
 .problem-next { margin-top: 4px !important; font-size: 17px; }
 
-.sample-row { display: grid; gap: 2px; }
+.sample-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 18px; }
 .sample {
   font: inherit; font-weight: 700; font-size: 19px; color: var(--blue); background: none; border: 0;
   padding: 10px 0; min-height: 48px; text-align: left; cursor: pointer; justify-self: start;
@@ -389,9 +380,8 @@ form.check { padding: 26px 32px 24px; display: flex; flex-direction: column; gap
 }
 .sample:hover { color: var(--red); text-decoration-thickness: 2px; }
 .sample:disabled { color: var(--ink); text-decoration: none; cursor: not-allowed; }
-.downloads, .privacy, .server { margin: 0; font-size: 17px; max-width: 60ch; }
+.downloads, .privacy { margin: 0; font-size: 17px; max-width: 60ch; }
 .downloads a { padding: 8px 0; font-weight: 700; }
-.server { font-weight: 500; }
 
 /* small-print band along the bottom of the leaf */
 .print { display: grid; grid-template-columns: minmax(0, 44%) minmax(0, 1fr); border-top: 1px solid var(--ink); }
@@ -430,11 +420,15 @@ html.tear .prev {
 .week-head h2, .sheet-head h2, .back h2 {
   margin: 0; font-family: var(--board); font-weight: 400; font-size: 48px; line-height: 1.05;
 }
+.week-head h2 [lang="hi"], .sheet-head h2 [lang="hi"] { font-family: var(--board); }
+.week-head h2 .en, .sheet-head h2 .en { font-family: var(--text); font-weight: 700; font-size: 24px; letter-spacing: 0; white-space: nowrap; }
+.stamps { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
 .stamp {
   margin: 0 0 6px; color: var(--blue); border: 1.5px solid var(--blue);
   padding: 4px 12px 2px; font-weight: 700; font-size: 17px; letter-spacing: 0.02em;
   transform: rotate(-1deg);
 }
+.sample-stamp { color: var(--ink); border: 2px solid var(--ink); font-weight: 800; transform: rotate(-2deg); }
 .summary { margin: 0 var(--inset) 16px; font-size: 18px; max-width: 80ch; }
 
 .strip { margin: 0 var(--inset); border: 2px solid var(--ink); background: var(--ink); }
@@ -463,6 +457,13 @@ html.tear .prev {
   background: var(--ink); clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 .day:hover { --lift: 30px; transform: translateY(-3px); }
+/* each day is a leaf: a perforated top edge above the numeral */
+.day::before {
+  content: ''; display: block; height: 9px; margin: 0 -14px;
+  background-image: radial-gradient(circle, currentColor 1.5px, transparent 2px);
+  background-size: 9px 9px; background-position: 3px center;
+  border-bottom: 1px solid currentColor;
+}
 .day .dn { display: flex; align-items: end; justify-content: space-between; gap: 6px; border-bottom: 1px solid var(--ink); padding-top: 10px; }
 .day .d { font-family: var(--num); font-weight: 800; font-stretch: 75%; font-variation-settings: 'wdth' 75; font-size: clamp(64px, 6.6vw, 96px); line-height: 0.8; padding-top: 10px; font-variant-numeric: lining-nums; }
 .day .wk { text-align: right; padding-bottom: 6px; min-width: 0; }
@@ -514,8 +515,13 @@ html.tear .prev {
 .lang input:focus-visible + span { outline: 3px solid var(--blue); outline-offset: 2px; position: relative; z-index: 1; }
 .lang input:disabled + span { cursor: progress; }
 .lang[aria-busy="true"] input:checked + span { background: var(--blue); border-color: var(--blue); }
-.say { margin: 0; font-size: 18px; max-width: 70ch; }
-.say .legends { display: flex; flex-wrap: wrap; gap: 4px 22px; margin-top: 4px; font-size: 17px; }
+.say { margin: 0; font-size: 18px; min-width: 0; }
+.say p { margin: 0; }
+.say-idle { max-width: 70ch; }
+.say-big { font-family: var(--num); font-weight: 800; font-size: 28px; line-height: 1.2; max-width: 48ch; text-wrap: balance; }
+.say-big[lang="en"], .say-big[lang="hi-Latn"] { font-family: var(--text); }
+.say-small { margin-top: 6px !important; font-size: 16px; display: flex; flex-wrap: wrap; gap: 4px 22px; align-items: baseline; }
+.say .legends { display: flex; flex-wrap: wrap; gap: 4px 22px; font-size: 16px; }
 .say .legend { display: inline-flex; gap: 6px; align-items: center; white-space: nowrap; }
 .say svg { width: 14px; height: 14px; stroke-width: 1.75; vertical-align: -1px; }
 .say.problem-line { color: var(--red); font-weight: 700; }
@@ -543,14 +549,25 @@ details.fine ul.prose { columns: auto; }
 .sheet { width: calc(var(--pad) - 2 * var(--inset)); margin: 64px auto 0; background: var(--leaf); border: 2px solid var(--ink); }
 .sheet-head { padding: 22px 28px 16px; border-bottom: 1px solid var(--ink); display: grid; gap: 6px; }
 .sheet-head h2 { font-size: 42px; }
+.sheet-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 24px; border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 4px; }
+.sheet-date { margin: 0; font-weight: 700; font-size: 17px; font-variant-numeric: tabular-nums; }
+/* the order list is the leaf that gets torn off and printed */
+.order::before {
+  content: ''; display: block; height: 10px;
+  background-image: radial-gradient(circle, var(--ink) 2px, transparent 2.5px);
+  background-size: 12px 10px; background-position: 4px center;
+  border-bottom: 1px solid var(--ink);
+}
 .sheet-sub { margin: 0; max-width: 70ch; font-size: 18px; }
 .sheet-body { padding: 18px 28px 26px; }
 
 .lines { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .lines thead th { text-align: left; font-size: 16px; font-weight: 500; padding: 0 10px 6px 0; border-bottom: 1px solid var(--ink); }
 .lines thead th.qcol { text-align: right; padding-right: 0; }
-.lines td { padding: 8px 10px 8px 0; border-bottom: 1px dashed var(--ink); vertical-align: middle; }
-.lines td:first-child { width: 52px; }
+.lines td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--ink); vertical-align: middle; }
+.lines th.ncol, .lines td.ncell { width: 44px; text-align: left; border-right: 1px solid var(--ink); padding-right: 0; }
+.lines td.ncell { font-family: var(--num); font-weight: 800; font-size: 22px; font-variant-numeric: tabular-nums; }
+.lines td:nth-child(2) { width: 64px; padding-left: 12px; }
 .lines td.qcell { text-align: right; padding-right: 0; white-space: nowrap; }
 .lines .it { font-size: 19px; font-weight: 700; overflow-wrap: anywhere; }
 .lines .it small { display: block; font-size: 16px; font-weight: 400; }
@@ -592,7 +609,10 @@ details.fine ul.prose { columns: auto; }
   display: inline-flex; gap: 10px; align-items: center; white-space: nowrap;
   transition: background-color 160ms var(--ease), color 160ms var(--ease);
 }
-.out button svg { width: 20px; height: 20px; }
+.out button svg { width: 20px; height: 20px; flex: none; }
+.out .bl { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.out .bl-hi { font-size: 20px; font-weight: 700; }
+.out .bl-en { font-size: 15px; font-weight: 700; }
 .out button:hover:not(:disabled) { background: var(--ink); color: var(--leaf); }
 .out button.done { background: var(--blue); border-color: var(--blue); color: var(--leaf); }
 .out button:disabled { border-style: dashed; cursor: not-allowed; }
@@ -665,6 +685,7 @@ details.fine ul.prose { columns: auto; }
 .own :focus-visible { outline-color: var(--leaf); }
 .code {
   margin: 0; padding: 16px 18px; background: var(--leaf); color: var(--ink); overflow-x: auto;
+  white-space: pre-wrap; overflow-wrap: anywhere;
   font-family: var(--code); font-size: 16px; line-height: 1.7; border: 1px solid var(--leaf);
 }
 .code::selection, .code *::selection { background: var(--blue); color: var(--leaf); }
@@ -705,7 +726,6 @@ details.fine ul.prose { columns: auto; }
   .month { padding: 6px 14px 4px; font-size: 17px; }
   .date { padding: 8px 14px 14px; column-gap: 14px; }
   .numeral { font-size: 250px; padding-top: 56px; }
-  .weekday .aaj { margin-bottom: 8px; font-size: 15px; }
   .weekday .dev { font-size: 40px; }
   .weekday .lat { font-size: 18px; }
   .weekday .full { font-size: 17px; margin-top: 10px; }
@@ -732,7 +752,8 @@ details.fine ul.prose { columns: auto; }
   .gone { grid-template-columns: 1fr; padding: 12px 14px; }
   .days { grid-template-columns: 1fr; }
   .day { min-height: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); column-gap: 14px; padding: 12px 14px; border-right: 0; }
-  .day .dn { flex-direction: column; align-items: flex-start; justify-content: start; border-bottom: 0; border-right: 1px solid var(--ink); padding: 0 10px 0 0; grid-row: 1 / span 2; }
+  .day::before { grid-column: 1 / -1; grid-row: 1; margin: -12px -14px 10px; }
+  .day .dn { flex-direction: column; align-items: flex-start; justify-content: start; border-bottom: 0; border-right: 1px solid var(--ink); padding: 0 10px 0 0; grid-row: 2 / span 2; }
   .day.urgent .dn { border-color: var(--leaf); }
   .day .d { font-size: 64px; padding-top: 6px; }
   .day .wk { text-align: left; padding: 4px 0 0; }
@@ -746,7 +767,10 @@ details.fine ul.prose { columns: auto; }
   .sheet-head { padding: 18px 14px 12px; }
   .sheet-head h2 { font-size: 34px; }
   .sheet-body { padding: 14px 14px 20px; }
-  .lines td:first-child { width: 48px; }
+  .lines th.ncol, .lines td.ncell { width: 32px; }
+  .lines td:nth-child(2) { width: 56px; padding-left: 6px; }
+  .week-head h2 .en, .sheet-head h2 .en { font-size: 20px; }
+  .say-big { font-size: 23px; }
   .qty { width: 6ch; font-size: 22px; }
   .shop { grid-template-columns: 1fr; }
   .out { flex-direction: column; }

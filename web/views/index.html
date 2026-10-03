@@ -37,8 +37,6 @@
       </div>
     </header>
 
-    <div class="stub" aria-hidden="true"></div>
-
     <div class="leaf-wrap">
       <span class="staple l" aria-hidden="true"></span>
       <span class="staple r" aria-hidden="true"></span>
@@ -51,10 +49,9 @@
           <div class="date">
             <p class="numeral" id="today-num" aria-hidden="true">&nbsp;</p>
             <p class="weekday">
-              <span class="aaj"><span lang="hi">आज</span> Today</span>
               <span class="dev" lang="hi" id="today-hi">&nbsp;</span>
               <span class="lat" id="today-lat">&nbsp;</span>
-              <span class="full" id="today-name">Today</span>
+              <span class="full" id="today-name"><span lang="hi">आज</span>, <span id="today-date">Today</span></span>
             </p>
           </div>
 
@@ -108,10 +105,9 @@
 
             <div class="sample-row">
               <button class="sample" id="sample" type="button">No files handy? Try it with sample data</button>
-              <p class="downloads">Or look at the sample files first: <a href="/api/sample/sales" download>sales</a>, <a href="/api/sample/stock" download>stock</a>.</p>
+              <p class="downloads">Or see the files: <a href="/api/sample/sales" download>sales</a>, <a href="/api/sample/stock" download>stock</a>.</p>
             </div>
-            <p class="privacy">This online demo sends quantities, not item names, to the models. The shop's own copy runs fully on his laptop.</p>
-            <p class="server" id="server">Checks at most <span data-limit="items">40 items</span> per run, files up to <span data-limit="mb">5 MB</span> each.</p>
+            <p class="privacy">The models get quantities, never item names. The shop's own copy runs fully on his laptop.</p>
           </form>
         </div>
 
@@ -126,7 +122,7 @@
               <thead><tr><th scope="col">Plain average</th><th scope="col">Same-weekday average</th><th scope="col">TabPFN</th></tr></thead>
               <tbody><tr><td class="v">3.71</td><td class="v">3.70</td><td class="v win">3.27</td></tr></tbody>
             </table>
-            <p class="weeks">Closer per day in 6 of 6 hidden weeks.</p>
+            <p class="weeks">Closer per day in 6 of 6 hidden weeks, per week in 5 of 6.</p>
           </div>
         </footer>
 
@@ -143,8 +139,11 @@
 
   <section class="week" id="week" aria-labelledby="week-title">
     <div class="week-head">
-      <h2 id="week-title">What runs out this week</h2>
-      <p class="stamp" id="week-stamp">The 7 days after today</p>
+      <h2 id="week-title"><span lang="hi">इस हफ़्ते क्या खत्म होगा</span> <span class="en">What runs out this week</span></h2>
+      <div class="stamps">
+        <p class="stamp sample-stamp" id="sample-stamp" hidden>Made-up sample items</p>
+        <p class="stamp" id="week-stamp">The 7 days after today</p>
+      </div>
     </div>
     <p class="summary" id="summary" hidden></p>
 
@@ -162,7 +161,7 @@
           <label><input type="radio" name="lang" value="English"><span>English</span></label>
           <label><input type="radio" name="lang" value="Hinglish"><span>Hinglish</span></label>
         </fieldset>
-        <p class="say" id="say" aria-live="polite">Add the two reports above, or try the sample, and every item that will run out is written on the day it runs out.</p>
+        <div class="say" id="say" aria-live="polite"><p class="say-idle">Add the two reports above, or try the sample, and every item that will run out is written on the day it runs out.</p></div>
       </div>
     </div>
 
@@ -171,7 +170,10 @@
 
   <section class="sheet order" id="order" aria-labelledby="order-title" hidden>
     <div class="sheet-head">
-      <h2 id="order-title">Order list</h2>
+      <div class="sheet-top">
+        <h2 id="order-title"><span lang="hi">ऑर्डर लिस्ट</span> <span class="en">Order list</span></h2>
+        <p class="sheet-date">Date: <span id="order-date">&nbsp;</span></p>
+      </div>
       <p class="sheet-sub">These are guesses, so change any quantity or untick an item before you send it.</p>
     </div>
     <div class="sheet-body">
@@ -179,7 +181,7 @@
       <div id="order-full">
         <table class="lines">
           <caption class="sr">Items to order, with the quantity in pieces</caption>
-          <thead><tr><th scope="col"><span class="sr">Order this item</span></th><th scope="col">Item</th><th scope="col" class="qcol">Quantity, pieces</th></tr></thead>
+          <thead><tr><th scope="col" class="ncol">No.</th><th scope="col"><span class="sr">Order this item</span></th><th scope="col">Item</th><th scope="col" class="qcol">Quantity, pieces</th></tr></thead>
           <tbody id="order-lines"></tbody>
         </table>
         <div class="shop">
@@ -189,11 +191,11 @@
         <div class="out">
           <button type="button" id="copy">
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 6h11v11H6zM3 13V3h10"/></svg>
-            <span>Copy for WhatsApp</span>
+            <span class="bl"><span lang="hi" class="bl-hi">WhatsApp के लिए कॉपी करें</span><span class="bl-en">Copy for WhatsApp</span></span>
           </button>
           <button type="button" id="print">
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7V2h10v5M5 14H2V7h16v7h-3M5 11h10v7H5z"/></svg>
-            <span>Print the order sheet</span>
+            <span class="bl"><span lang="hi" class="bl-hi">ऑर्डर शीट प्रिंट करें</span><span class="bl-en">Print the order sheet</span></span>
           </button>
         </div>
         <p class="out-status" id="out-status" aria-live="polite"></p>
