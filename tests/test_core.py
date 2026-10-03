@@ -6,15 +6,15 @@ import pandas as pd
 import pytest
 from conftest import ROOT, FakeTabPFN
 
-from intake import load_sales
-from predictor import forecast
+from core.intake import load_sales
+from core.predictor import forecast
 from web.config import Settings
 
 
 def test_predictor_imports_without_torch_or_tabpfn():
     # None in sys.modules makes any import of these fail, as on a machine without them
     code = ("import sys; sys.modules.update(torch=None, tabpfn=None, tabpfn_client=None); "
-            "import predictor; print(predictor.LocalTabPFN.__name__)")
+            "from core import predictor; print(predictor.LocalTabPFN.__name__)")
     run = subprocess.run([sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True)
     assert run.returncode == 0, run.stderr
     assert "torch" not in sys.modules or sys.modules["torch"] is None
@@ -42,7 +42,7 @@ def test_settings_from_env():
 
 
 def test_pdftotext_has_a_timeout(monkeypatch):
-    import pdf_to_sales
+    from core import pdf_to_sales
     seen = {}
 
     def run(*args, **kwargs):
@@ -54,7 +54,7 @@ def test_pdftotext_has_a_timeout(monkeypatch):
         pdf_to_sales.read_bills(b"%PDF")
     assert seen["timeout"] == 60
 
-    from intake import DataProblem
+    from core.intake import DataProblem
     from web.repositories.uploads import FileRepository, UploadedFile
     with pytest.raises(DataProblem, match="Could not read"):
         FileRepository((".pdf",), 1).open_sales(UploadedFile("bills.pdf", b"%PDF"))

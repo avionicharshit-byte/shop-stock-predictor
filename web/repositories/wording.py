@@ -6,7 +6,7 @@ from functools import partial
 
 import requests
 
-from message import ask_ollama
+from core.note_wording import ask_ollama
 
 log = logging.getLogger(__name__)
 RETRY_STATUS = {429, 500, 502, 503, 504}

@@ -1,7 +1,7 @@
 """What the client sends."""
 from pydantic import BaseModel, Field, field_validator
 
-from thermal import PAPER_WIDTHS
+from core.receipt_printer import PAPER_WIDTHS
 
 
 class NoteRequest(BaseModel):

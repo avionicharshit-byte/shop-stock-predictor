@@ -7,9 +7,9 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from intake import SALES_COLUMNS, STOCK_COLUMNS, DataProblem
-from predictor import check_enough_days, forecast, split_rare_items
-from reorder import items_without_stock, reorder_plan
+from core.intake import SALES_COLUMNS, STOCK_COLUMNS, DataProblem
+from core.predictor import check_enough_days, forecast, split_rare_items
+from core.reorder import items_without_stock, reorder_plan
 from web.config import LANGUAGES, Settings
 from web.models import Capped, ColumnQuestion, JobStatus, NoteLine, NoteResult, PlanLine, StockCheckResult
 from web.repositories.forecasting import ForecastingGateway, ModelNotConfigured

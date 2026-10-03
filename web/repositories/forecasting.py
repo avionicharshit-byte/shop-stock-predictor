@@ -3,7 +3,7 @@ import importlib.util
 import logging
 import threading
 
-from predictor import HostedTabPFN, LocalTabPFN
+from core.predictor import HostedTabPFN, LocalTabPFN
 
 log = logging.getLogger(__name__)
 

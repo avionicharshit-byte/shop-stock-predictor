@@ -4,12 +4,12 @@ from html import escape
 import pandas as pd
 import streamlit as st
 
-from intake import SALES_COLUMNS, STOCK_COLUMNS, DataProblem, clean_sales, clean_stock, open_sales, open_stock
-from message import friendly_note
-from order_sheet import order_html, order_text
-from predictor import check_enough_days, forecast, honesty_test, split_rare_items
-from reorder import items_without_stock, reorder_plan
-from thermal import PAPER_WIDTHS, PrinterProblem, find_printers, order_receipt, send_to_printer
+from core.intake import SALES_COLUMNS, STOCK_COLUMNS, DataProblem, clean_sales, clean_stock, open_sales, open_stock
+from core.note_wording import friendly_note
+from core.order_sheet import order_html, order_text
+from core.predictor import check_enough_days, forecast, honesty_test, split_rare_items
+from core.reorder import items_without_stock, reorder_plan
+from core.receipt_printer import PAPER_WIDTHS, PrinterProblem, find_printers, order_receipt, send_to_printer
 
 SAMPLE_SALES, SAMPLE_STOCK = "data/sample_sales.csv", "data/sample_stock.csv"
 FILE_TYPES = ["pdf", "xlsx", "xls", "csv"]

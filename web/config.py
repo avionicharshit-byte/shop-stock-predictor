@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-from predictor import HORIZON_DAYS
+from core.predictor import HORIZON_DAYS
 
 ROOT = Path(__file__).resolve().parent.parent
 LANGUAGES = ["Hindi", "English", "Hinglish"]  # the first is the default

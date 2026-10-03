@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 import pdfplumber
 
-from pdf_to_sales import read_bills
+from core.pdf_to_sales import read_bills
 
 # header names seen in billing-app exports, most trusted first
 SALES_COLUMNS = {

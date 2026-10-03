@@ -1,7 +1,7 @@
-"""Wording the plan in a language. The slots, examples and fact check in message.py apply to every Gemma."""
+"""Wording the plan in a language. The slots, examples and fact check in note_wording.py apply to every Gemma."""
 import pandas as pd
 
-from message import friendly_lines
+from core.note_wording import friendly_lines
 from web.repositories.wording import WordingGateway
 
 

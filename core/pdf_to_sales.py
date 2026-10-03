@@ -1,6 +1,6 @@
 """Read the billing app's bill-wise "Sales report" PDF.
 
-Usage: python pdf_to_sales.py report.pdf sales.csv
+Usage: python -m core.pdf_to_sales report.pdf sales.csv
 """
 import re
 import subprocess

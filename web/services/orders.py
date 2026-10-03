@@ -1,8 +1,8 @@
 """The order list for the supplier, as WhatsApp text, a printable page or receipt printer bytes."""
 import pandas as pd
 
-from order_sheet import order_html, order_text
-from thermal import PAPER_WIDTHS, order_receipt
+from core.order_sheet import order_html, order_text
+from core.receipt_printer import PAPER_WIDTHS, order_receipt
 from web.models import OrderRequest, ReceiptRequest
 
 

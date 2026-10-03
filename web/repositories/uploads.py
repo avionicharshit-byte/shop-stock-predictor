@@ -2,7 +2,7 @@
 import subprocess
 from pathlib import Path
 
-from intake import DataProblem, OpenedFile, clean_sales, clean_stock, open_sales, open_stock
+from core.intake import DataProblem, OpenedFile, clean_sales, clean_stock, open_sales, open_stock
 
 
 class FileTooBig(DataProblem):

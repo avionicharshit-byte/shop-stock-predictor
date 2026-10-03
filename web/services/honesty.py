@@ -3,8 +3,8 @@ import logging
 
 import pandas as pd
 
-from intake import DataProblem
-from predictor import honesty_test
+from core.intake import DataProblem
+from core.predictor import honesty_test
 from web.models import GuessError, HonestyResult, HonestyRow
 
 log = logging.getLogger(__name__)

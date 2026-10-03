@@ -4,7 +4,7 @@ from concurrent.futures import Executor, ThreadPoolExecutor, as_completed
 import numpy as np
 import pandas as pd
 
-from intake import DataProblem
+from core.intake import DataProblem
 
 HORIZON_DAYS = 7
 MIN_DAYS_TO_PREDICT = 7

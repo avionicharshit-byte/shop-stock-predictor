@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from message import _keeps_the_facts, _template, friendly_lines, friendly_note
+from core.note_wording import _keeps_the_facts, _template, friendly_lines, friendly_note
 from web.repositories.wording import WordingGateway, ask_google_gemma, google_answer
 
 

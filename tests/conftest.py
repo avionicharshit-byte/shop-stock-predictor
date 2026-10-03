@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from predictor import BUSY_WEEK, _guess_one_item
+from core.predictor import BUSY_WEEK, _guess_one_item
 from web.config import Settings
 from web.main import create_app
 

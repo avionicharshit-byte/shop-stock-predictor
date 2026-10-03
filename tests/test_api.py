@@ -3,9 +3,9 @@ import threading
 import pandas as pd
 from conftest import ROOT, FakeTabPFN, make_client, wait_for
 
-from intake import load_sales, load_stock
-from predictor import forecast, split_rare_items
-from reorder import reorder_plan
+from core.intake import load_sales, load_stock
+from core.predictor import forecast, split_rare_items
+from core.reorder import reorder_plan
 
 SALES, STOCK = str(ROOT / "data" / "sample_sales.csv"), str(ROOT / "data" / "sample_stock.csv")
 
@@ -267,7 +267,7 @@ def test_orders(client):
 
 
 def test_order_receipt_is_the_laptop_receipt(client):
-    import thermal
+    from core import receipt_printer
     from web.services.orders import OrderService
 
     day = pd.Timestamp("2026-10-03")
@@ -279,10 +279,10 @@ def test_order_receipt_is_the_laptop_receipt(client):
 
     two = client.post("/api/orders/receipt", json=body)
     assert two.status_code == 200 and two.headers["content-type"] == "application/octet-stream"
-    assert two.content == thermal.order_receipt("Sharma Store", "Main Road, Jaipur", order, day, 32)
+    assert two.content == receipt_printer.order_receipt("Sharma Store", "Main Road, Jaipur", order, day, 32)
 
     three = client.post("/api/orders/receipt", json={**body, "paper": "3 inch (80 mm)"})
-    assert three.content == thermal.order_receipt("Sharma Store", "Main Road, Jaipur", order, day, 48)
+    assert three.content == receipt_printer.order_receipt("Sharma Store", "Main Road, Jaipur", order, day, 48)
     assert b"\n" + b"-" * 48 + b"\n" in three.content and b"-" * 49 not in three.content
 
     bad = client.post("/api/orders/receipt", json={**body, "paper": "4 inch"})

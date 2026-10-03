@@ -1,5 +1,9 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
+
+DATA = Path(__file__).resolve().parent.parent / "data"  # the repo's data/, from any folder
 
 ITEMS = {  # item: (average sold per day, weekend boost, pack size)
     "Maggi 70g": (14, 1.5, 24), "Parle-G": (22, 1.1, 30), "Amul Milk 500ml": (35, 1.0, 20),
@@ -15,9 +19,9 @@ for item, (mean, weekend, _) in ITEMS.items():
     for day in days:
         boost = weekend if day.dayofweek >= 5 else 1.0
         rows.append({"date": day.date(), "item": item, "qty_sold": int(rng.poisson(mean * boost))})
-pd.DataFrame(rows).to_csv("data/sample_sales.csv", index=False)
+pd.DataFrame(rows).to_csv(DATA / "sample_sales.csv", index=False)
 
 stock = [{"item": item, "stock_left": int(mean * rng.uniform(1, 9)), "pack_size": pack}
          for item, (mean, _, pack) in ITEMS.items()]
-pd.DataFrame(stock).to_csv("data/sample_stock.csv", index=False)
+pd.DataFrame(stock).to_csv(DATA / "sample_stock.csv", index=False)
 print("wrote data/sample_sales.csv and data/sample_stock.csv")

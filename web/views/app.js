@@ -659,14 +659,14 @@
   // ---------- receipt printer, over Web Bluetooth ----------
 
   // serial-style write channels of cheap receipt printers, tried in this order. the first is the one
-  // the laptop version uses (thermal.WRITE_CHANNEL)
+  // the laptop version uses (receipt_printer.WRITE_CHANNEL)
   var RECEIPT_CHANNELS = [
     ['49535343-fe7d-4ae5-8fa9-9fafd205e455', '49535343-8841-43f4-a8d4-ecbe34729bb3'],
     ['000018f0-0000-1000-8000-00805f9b34fb', '00002af1-0000-1000-8000-00805f9b34fb'],
     ['e7810a71-73ae-499d-8c15-faa9aef0c3f2', 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f']
   ];
   var RECEIPT_SERVICES = RECEIPT_CHANNELS.map(function (pair) { return pair[0]; });
-  // thermal.PRINTER_NAME_HINTS plus names these printers often advertise
+  // receipt_printer.PRINTER_NAME_HINTS plus names these printers often advertise
   var PRINTER_NAMES = ['PSF', 'SR588', 'MPT', 'POS', 'PRINTER', 'RPP', 'PT-', 'Printer', 'BlueTooth Printer', 'MTP', 'EVOFOX'];
   var CONNECT_ATTEMPTS = 3;
   var CHUNK_BYTES = 100, SMALL_CHUNK_BYTES = 20;
