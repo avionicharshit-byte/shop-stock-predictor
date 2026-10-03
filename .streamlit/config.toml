@@ -1,0 +1,19 @@
+# no "base" here on purpose: the page follows the computer's light or dark setting,
+# and the user can switch it from the menu at the top right (Settings > Theme)
+[theme]
+baseFontSize = 17
+
+[theme.light]
+primaryColor = "#0F766E"
+backgroundColor = "#FAFAF7"
+secondaryBackgroundColor = "#E8EFEC"
+textColor = "#1F2937"
+
+[theme.dark]
+primaryColor = "#14B8A6"
+backgroundColor = "#0F1715"
+secondaryBackgroundColor = "#1C2925"
+textColor = "#E6ECEA"
+
+[browser]
+gatherUsageStats = false

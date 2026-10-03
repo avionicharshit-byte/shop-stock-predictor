@@ -1,0 +1,281 @@
+date,item,qty_sold
+2026-09-05,Maggi 70g,25
+2026-09-06,Maggi 70g,18
+2026-09-07,Maggi 70g,18
+2026-09-08,Maggi 70g,12
+2026-09-09,Maggi 70g,11
+2026-09-10,Maggi 70g,14
+2026-09-11,Maggi 70g,10
+2026-09-12,Maggi 70g,22
+2026-09-13,Maggi 70g,20
+2026-09-14,Maggi 70g,15
+2026-09-15,Maggi 70g,14
+2026-09-16,Maggi 70g,16
+2026-09-17,Maggi 70g,12
+2026-09-18,Maggi 70g,18
+2026-09-19,Maggi 70g,18
+2026-09-20,Maggi 70g,21
+2026-09-21,Maggi 70g,16
+2026-09-22,Maggi 70g,8
+2026-09-23,Maggi 70g,14
+2026-09-24,Maggi 70g,12
+2026-09-25,Maggi 70g,6
+2026-09-26,Maggi 70g,18
+2026-09-27,Maggi 70g,26
+2026-09-28,Maggi 70g,15
+2026-09-29,Maggi 70g,16
+2026-09-30,Maggi 70g,13
+2026-10-01,Maggi 70g,13
+2026-10-02,Maggi 70g,25
+2026-09-05,Parle-G,27
+2026-09-06,Parle-G,31
+2026-09-07,Parle-G,16
+2026-09-08,Parle-G,23
+2026-09-09,Parle-G,23
+2026-09-10,Parle-G,29
+2026-09-11,Parle-G,23
+2026-09-12,Parle-G,23
+2026-09-13,Parle-G,24
+2026-09-14,Parle-G,19
+2026-09-15,Parle-G,21
+2026-09-16,Parle-G,28
+2026-09-17,Parle-G,23
+2026-09-18,Parle-G,20
+2026-09-19,Parle-G,29
+2026-09-20,Parle-G,23
+2026-09-21,Parle-G,26
+2026-09-22,Parle-G,25
+2026-09-23,Parle-G,17
+2026-09-24,Parle-G,17
+2026-09-25,Parle-G,32
+2026-09-26,Parle-G,22
+2026-09-27,Parle-G,35
+2026-09-28,Parle-G,22
+2026-09-29,Parle-G,26
+2026-09-30,Parle-G,21
+2026-10-01,Parle-G,21
+2026-10-02,Parle-G,13
+2026-09-05,Amul Milk 500ml,35
+2026-09-06,Amul Milk 500ml,30
+2026-09-07,Amul Milk 500ml,38
+2026-09-08,Amul Milk 500ml,32
+2026-09-09,Amul Milk 500ml,29
+2026-09-10,Amul Milk 500ml,42
+2026-09-11,Amul Milk 500ml,37
+2026-09-12,Amul Milk 500ml,37
+2026-09-13,Amul Milk 500ml,34
+2026-09-14,Amul Milk 500ml,37
+2026-09-15,Amul Milk 500ml,23
+2026-09-16,Amul Milk 500ml,39
+2026-09-17,Amul Milk 500ml,43
+2026-09-18,Amul Milk 500ml,45
+2026-09-19,Amul Milk 500ml,17
+2026-09-20,Amul Milk 500ml,30
+2026-09-21,Amul Milk 500ml,29
+2026-09-22,Amul Milk 500ml,28
+2026-09-23,Amul Milk 500ml,47
+2026-09-24,Amul Milk 500ml,41
+2026-09-25,Amul Milk 500ml,37
+2026-09-26,Amul Milk 500ml,36
+2026-09-27,Amul Milk 500ml,42
+2026-09-28,Amul Milk 500ml,32
+2026-09-29,Amul Milk 500ml,26
+2026-09-30,Amul Milk 500ml,41
+2026-10-01,Amul Milk 500ml,42
+2026-10-02,Amul Milk 500ml,27
+2026-09-05,Tata Salt 1kg,5
+2026-09-06,Tata Salt 1kg,9
+2026-09-07,Tata Salt 1kg,6
+2026-09-08,Tata Salt 1kg,3
+2026-09-09,Tata Salt 1kg,6
+2026-09-10,Tata Salt 1kg,4
+2026-09-11,Tata Salt 1kg,3
+2026-09-12,Tata Salt 1kg,2
+2026-09-13,Tata Salt 1kg,6
+2026-09-14,Tata Salt 1kg,8
+2026-09-15,Tata Salt 1kg,3
+2026-09-16,Tata Salt 1kg,5
+2026-09-17,Tata Salt 1kg,11
+2026-09-18,Tata Salt 1kg,4
+2026-09-19,Tata Salt 1kg,9
+2026-09-20,Tata Salt 1kg,7
+2026-09-21,Tata Salt 1kg,4
+2026-09-22,Tata Salt 1kg,5
+2026-09-23,Tata Salt 1kg,2
+2026-09-24,Tata Salt 1kg,3
+2026-09-25,Tata Salt 1kg,6
+2026-09-26,Tata Salt 1kg,2
+2026-09-27,Tata Salt 1kg,5
+2026-09-28,Tata Salt 1kg,8
+2026-09-29,Tata Salt 1kg,4
+2026-09-30,Tata Salt 1kg,5
+2026-10-01,Tata Salt 1kg,3
+2026-10-02,Tata Salt 1kg,10
+2026-09-05,Surf Excel 1kg,6
+2026-09-06,Surf Excel 1kg,5
+2026-09-07,Surf Excel 1kg,6
+2026-09-08,Surf Excel 1kg,3
+2026-09-09,Surf Excel 1kg,2
+2026-09-10,Surf Excel 1kg,1
+2026-09-11,Surf Excel 1kg,6
+2026-09-12,Surf Excel 1kg,3
+2026-09-13,Surf Excel 1kg,3
+2026-09-14,Surf Excel 1kg,2
+2026-09-15,Surf Excel 1kg,4
+2026-09-16,Surf Excel 1kg,6
+2026-09-17,Surf Excel 1kg,4
+2026-09-18,Surf Excel 1kg,4
+2026-09-19,Surf Excel 1kg,5
+2026-09-20,Surf Excel 1kg,7
+2026-09-21,Surf Excel 1kg,2
+2026-09-22,Surf Excel 1kg,4
+2026-09-23,Surf Excel 1kg,4
+2026-09-24,Surf Excel 1kg,3
+2026-09-25,Surf Excel 1kg,3
+2026-09-26,Surf Excel 1kg,6
+2026-09-27,Surf Excel 1kg,4
+2026-09-28,Surf Excel 1kg,1
+2026-09-29,Surf Excel 1kg,2
+2026-09-30,Surf Excel 1kg,3
+2026-10-01,Surf Excel 1kg,3
+2026-10-02,Surf Excel 1kg,3
+2026-09-05,Lays Classic,29
+2026-09-06,Lays Classic,22
+2026-09-07,Lays Classic,22
+2026-09-08,Lays Classic,14
+2026-09-09,Lays Classic,16
+2026-09-10,Lays Classic,18
+2026-09-11,Lays Classic,20
+2026-09-12,Lays Classic,37
+2026-09-13,Lays Classic,30
+2026-09-14,Lays Classic,17
+2026-09-15,Lays Classic,13
+2026-09-16,Lays Classic,20
+2026-09-17,Lays Classic,12
+2026-09-18,Lays Classic,13
+2026-09-19,Lays Classic,26
+2026-09-20,Lays Classic,38
+2026-09-21,Lays Classic,19
+2026-09-22,Lays Classic,17
+2026-09-23,Lays Classic,24
+2026-09-24,Lays Classic,19
+2026-09-25,Lays Classic,24
+2026-09-26,Lays Classic,29
+2026-09-27,Lays Classic,35
+2026-09-28,Lays Classic,19
+2026-09-29,Lays Classic,18
+2026-09-30,Lays Classic,21
+2026-10-01,Lays Classic,17
+2026-10-02,Lays Classic,21
+2026-09-05,Coca-Cola 750ml,10
+2026-09-06,Coca-Cola 750ml,13
+2026-09-07,Coca-Cola 750ml,7
+2026-09-08,Coca-Cola 750ml,10
+2026-09-09,Coca-Cola 750ml,6
+2026-09-10,Coca-Cola 750ml,14
+2026-09-11,Coca-Cola 750ml,9
+2026-09-12,Coca-Cola 750ml,15
+2026-09-13,Coca-Cola 750ml,14
+2026-09-14,Coca-Cola 750ml,7
+2026-09-15,Coca-Cola 750ml,6
+2026-09-16,Coca-Cola 750ml,7
+2026-09-17,Coca-Cola 750ml,8
+2026-09-18,Coca-Cola 750ml,11
+2026-09-19,Coca-Cola 750ml,19
+2026-09-20,Coca-Cola 750ml,13
+2026-09-21,Coca-Cola 750ml,10
+2026-09-22,Coca-Cola 750ml,7
+2026-09-23,Coca-Cola 750ml,7
+2026-09-24,Coca-Cola 750ml,10
+2026-09-25,Coca-Cola 750ml,8
+2026-09-26,Coca-Cola 750ml,14
+2026-09-27,Coca-Cola 750ml,17
+2026-09-28,Coca-Cola 750ml,7
+2026-09-29,Coca-Cola 750ml,10
+2026-09-30,Coca-Cola 750ml,8
+2026-10-01,Coca-Cola 750ml,7
+2026-10-02,Coca-Cola 750ml,17
+2026-09-05,Aashirvaad Atta 5kg,5
+2026-09-06,Aashirvaad Atta 5kg,5
+2026-09-07,Aashirvaad Atta 5kg,3
+2026-09-08,Aashirvaad Atta 5kg,3
+2026-09-09,Aashirvaad Atta 5kg,3
+2026-09-10,Aashirvaad Atta 5kg,2
+2026-09-11,Aashirvaad Atta 5kg,5
+2026-09-12,Aashirvaad Atta 5kg,4
+2026-09-13,Aashirvaad Atta 5kg,6
+2026-09-14,Aashirvaad Atta 5kg,5
+2026-09-15,Aashirvaad Atta 5kg,2
+2026-09-16,Aashirvaad Atta 5kg,2
+2026-09-17,Aashirvaad Atta 5kg,2
+2026-09-18,Aashirvaad Atta 5kg,2
+2026-09-19,Aashirvaad Atta 5kg,5
+2026-09-20,Aashirvaad Atta 5kg,1
+2026-09-21,Aashirvaad Atta 5kg,1
+2026-09-22,Aashirvaad Atta 5kg,2
+2026-09-23,Aashirvaad Atta 5kg,3
+2026-09-24,Aashirvaad Atta 5kg,4
+2026-09-25,Aashirvaad Atta 5kg,6
+2026-09-26,Aashirvaad Atta 5kg,2
+2026-09-27,Aashirvaad Atta 5kg,5
+2026-09-28,Aashirvaad Atta 5kg,6
+2026-09-29,Aashirvaad Atta 5kg,0
+2026-09-30,Aashirvaad Atta 5kg,6
+2026-10-01,Aashirvaad Atta 5kg,3
+2026-10-02,Aashirvaad Atta 5kg,3
+2026-09-05,Colgate 100g,5
+2026-09-06,Colgate 100g,5
+2026-09-07,Colgate 100g,2
+2026-09-08,Colgate 100g,5
+2026-09-09,Colgate 100g,2
+2026-09-10,Colgate 100g,1
+2026-09-11,Colgate 100g,5
+2026-09-12,Colgate 100g,7
+2026-09-13,Colgate 100g,4
+2026-09-14,Colgate 100g,4
+2026-09-15,Colgate 100g,2
+2026-09-16,Colgate 100g,7
+2026-09-17,Colgate 100g,6
+2026-09-18,Colgate 100g,1
+2026-09-19,Colgate 100g,3
+2026-09-20,Colgate 100g,2
+2026-09-21,Colgate 100g,4
+2026-09-22,Colgate 100g,4
+2026-09-23,Colgate 100g,7
+2026-09-24,Colgate 100g,2
+2026-09-25,Colgate 100g,2
+2026-09-26,Colgate 100g,2
+2026-09-27,Colgate 100g,3
+2026-09-28,Colgate 100g,5
+2026-09-29,Colgate 100g,4
+2026-09-30,Colgate 100g,7
+2026-10-01,Colgate 100g,6
+2026-10-02,Colgate 100g,5
+2026-09-05,Bread,16
+2026-09-06,Bread,14
+2026-09-07,Bread,17
+2026-09-08,Bread,14
+2026-09-09,Bread,17
+2026-09-10,Bread,24
+2026-09-11,Bread,17
+2026-09-12,Bread,16
+2026-09-13,Bread,18
+2026-09-14,Bread,22
+2026-09-15,Bread,15
+2026-09-16,Bread,16
+2026-09-17,Bread,17
+2026-09-18,Bread,21
+2026-09-19,Bread,14
+2026-09-20,Bread,15
+2026-09-21,Bread,8
+2026-09-22,Bread,12
+2026-09-23,Bread,14
+2026-09-24,Bread,14
+2026-09-25,Bread,17
+2026-09-26,Bread,18
+2026-09-27,Bread,12
+2026-09-28,Bread,15
+2026-09-29,Bread,17
+2026-09-30,Bread,15
+2026-10-01,Bread,17
+2026-10-02,Bread,25
