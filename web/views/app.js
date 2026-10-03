@@ -32,7 +32,8 @@
     lines: [],
     linesLanguage: null,
     linesByAi: [],
-    wordedByAi: 0
+    wordedByAi: 0,
+    printing: false
   };
 
   // ---------- small helpers ----------
@@ -565,6 +566,9 @@
     var none = !orderBody().lines.length;
     $('copy').disabled = none;
     $('print').disabled = none;
+    $('receipt').disabled = none || state.printing;
+    $('any-printer').disabled = none || state.printing;
+    if (state.printing) return;
     var status = $('out-status');
     status.classList.toggle('bad', none);
     status.textContent = none ? 'Tick at least one item to make an order list.' : '';
@@ -651,6 +655,189 @@
       outProblem(error && error.message && error.message.indexOf('fetch') === -1 ? error.message : 'Could not reach the server. Try again.');
     }).then(function () { button.removeAttribute('aria-busy'); });
   });
+
+  // ---------- receipt printer, over Web Bluetooth ----------
+
+  // serial-style write channels of cheap receipt printers, tried in this order. the first is the one
+  // the laptop version uses (thermal.WRITE_CHANNEL)
+  var RECEIPT_CHANNELS = [
+    ['49535343-fe7d-4ae5-8fa9-9fafd205e455', '49535343-8841-43f4-a8d4-ecbe34729bb3'],
+    ['000018f0-0000-1000-8000-00805f9b34fb', '00002af1-0000-1000-8000-00805f9b34fb'],
+    ['e7810a71-73ae-499d-8c15-faa9aef0c3f2', 'bef8d6c9-9c21-4c9e-b632-bd58c1009f9f']
+  ];
+  var RECEIPT_SERVICES = RECEIPT_CHANNELS.map(function (pair) { return pair[0]; });
+  // thermal.PRINTER_NAME_HINTS plus names these printers often advertise
+  var PRINTER_NAMES = ['PSF', 'SR588', 'MPT', 'POS', 'PRINTER', 'RPP', 'PT-', 'Printer', 'BlueTooth Printer', 'MTP', 'EVOFOX'];
+  var CONNECT_ATTEMPTS = 3;
+  var CHUNK_BYTES = 100, SMALL_CHUNK_BYTES = 20;
+  var RECEIPT_TEXT = {
+    reach: 'Could not reach the printer. Switch it on, keep it near, and try again.',
+    channel: 'This printer does not offer a channel I know how to print on.',
+    network: 'Could not reach the server. Try again.'
+  };
+
+  function canPrintReceipt() {
+    return !!(navigator.bluetooth && window.isSecureContext && navigator.bluetooth.requestDevice);
+  }
+
+  function wait(ms) { return new Promise(function (done) { setTimeout(done, ms); }); }
+
+  function failure(kind, message) {
+    var error = new Error(message || RECEIPT_TEXT[kind]);
+    error.kind = kind;
+    return error;
+  }
+
+  function receiptStatus(text, bad) {
+    var status = $('out-status');
+    status.classList.toggle('bad', !!bad);
+    status.textContent = text;
+  }
+
+  function setPrinting(on) {
+    state.printing = on;
+    var button = $('receipt');
+    if (on) button.setAttribute('aria-busy', 'true');
+    else button.removeAttribute('aria-busy');
+    $('paper').querySelectorAll('input').forEach(function (input) { input.disabled = on; });
+    var none = !state.result || !orderBody().lines.length;
+    button.disabled = on || none;
+    $('any-printer').disabled = on || none;
+  }
+
+  function connectPrinter(device, attemptsLeft) {
+    return device.gatt.connect().catch(function () {
+      // the first knock often fails with no reason given, the next one works
+      if (attemptsLeft <= 1) throw failure('reach');
+      return wait(800).then(function () { return connectPrinter(device, attemptsLeft - 1); });
+    });
+  }
+
+  function writable(characteristic) {
+    return characteristic.properties && (characteristic.properties.write || characteristic.properties.writeWithoutResponse);
+  }
+
+  function anyWriteChannel(server) {
+    return server.getPrimaryServices().then(function (services) {
+      var i = 0;
+      function nextService() {
+        if (i >= services.length) throw failure('channel');
+        var service = services[i++];
+        return service.getCharacteristics().then(function (list) {
+          var found = list.filter(writable)[0];
+          return found || nextService();
+        }, nextService);
+      }
+      return nextService();
+    }, function () { throw failure('channel'); });
+  }
+
+  function writeChannel(server) {
+    function known(i) {
+      if (i >= RECEIPT_CHANNELS.length) return anyWriteChannel(server);
+      return server.getPrimaryService(RECEIPT_CHANNELS[i][0])
+        .then(function (service) { return service.getCharacteristic(RECEIPT_CHANNELS[i][1]); })
+        .then(function (characteristic) { return writable(characteristic) ? characteristic : known(i + 1); },
+          function () { return known(i + 1); });
+    }
+    return known(0);
+  }
+
+  function writeReceipt(device, characteristic, bytes) {
+    var withResponse = !!characteristic.properties.write;
+    var size = CHUNK_BYTES;
+    function writeChunk(chunk) {
+      if (withResponse) {
+        return characteristic.writeValueWithResponse ? characteristic.writeValueWithResponse(chunk) : characteristic.writeValue(chunk);
+      }
+      var sent = characteristic.writeValueWithoutResponse ? characteristic.writeValueWithoutResponse(chunk) : characteristic.writeValue(chunk);
+      return sent.then(function () { return wait(30); });
+    }
+    function from(start) {
+      if (start >= bytes.length) return Promise.resolve();
+      var chunk = bytes.slice(start, start + size);
+      return writeChunk(chunk).then(function () { return from(start + chunk.length); }, function (error) {
+        // a printer with a small packet size refuses 100 bytes at once, 20 always fits
+        var tooBig = error && (error.name === 'InvalidModificationError' || error.name === 'NotSupportedError' ||
+          /size|length|long|mtu/i.test(error.message || ''));
+        if (size > SMALL_CHUNK_BYTES && (tooBig || start === 0) && device.gatt.connected) {
+          size = SMALL_CHUNK_BYTES;
+          return from(start);
+        }
+        throw failure('reach');
+      });
+    }
+    return from(0);
+  }
+
+  function chosenPaper() {
+    var checked = document.querySelector('#paper input:checked');
+    return checked ? checked.value : '2 inch (58 mm)';
+  }
+
+  function printReceipt(anyDevice) {
+    if (state.printing || !canPrintReceipt()) return;
+    var body = orderBody();
+    if (!body.lines.length) return;
+    body.paper = chosenPaper();
+    var options = anyDevice
+      ? { acceptAllDevices: true, optionalServices: RECEIPT_SERVICES }
+      : { filters: PRINTER_NAMES.map(function (name) { return { namePrefix: name }; })
+          .concat(RECEIPT_SERVICES.map(function (service) { return { services: [service] }; })),
+          optionalServices: RECEIPT_SERVICES };
+    // the chooser must open before anything is awaited, or the click no longer counts
+    var chosen;
+    try { chosen = navigator.bluetooth.requestDevice(options); } catch (error) { chosen = Promise.reject(error); }
+    setPrinting(true);
+    receiptStatus('Choose your printer in the list that opened.');
+    var device = null, bytes = null;
+    chosen.then(function (picked) {
+      device = picked;
+      receiptStatus('Getting the receipt ready');
+      return post('/api/orders/receipt', body).catch(function () { throw failure('network'); });
+    }).then(function (reply) {
+      if (!reply.ok) {
+        return reply.json().catch(function () { return {}; }).then(function (data) {
+          throw failure('server', data.problem || 'The receipt could not be made. Try again.');
+        });
+      }
+      return reply.arrayBuffer();
+    }).then(function (buffer) {
+      bytes = new Uint8Array(buffer);
+      receiptStatus('Connecting to ' + (device.name || 'the printer'));
+      return connectPrinter(device, CONNECT_ATTEMPTS);
+    }).then(function (server) {
+      return writeChannel(server);
+    }).then(function (characteristic) {
+      receiptStatus('Printing');
+      return writeReceipt(device, characteristic, bytes);
+    }).then(function () {
+      return wait(1000); // let the last lines print before the link closes
+    }).then(function () {
+      receiptStatus('Printed. Tear the paper off.');
+    }).catch(function (error) {
+      if (!device && error && error.name === 'NotFoundError') {
+        receiptStatus(''); // the visitor closed the chooser
+        return;
+      }
+      if (error && error.kind) receiptStatus(error.message, true);
+      else if (!device) receiptStatus('The printer list could not open. Try again.', true);
+      else receiptStatus(RECEIPT_TEXT.reach, true);
+    }).then(function () {
+      try { if (device && device.gatt && device.gatt.connected) device.gatt.disconnect(); } catch (e) { /* already gone */ }
+      setPrinting(false);
+    });
+  }
+
+  if (canPrintReceipt()) {
+    $('receipt').hidden = false;
+    $('paper').hidden = false;
+    $('receipt-note').hidden = false;
+    $('receipt').addEventListener('click', function () { printReceipt(false); });
+    $('any-printer').addEventListener('click', function () { printReceipt(true); });
+  } else {
+    $('receipt-unsupported').hidden = false;
+  }
 
   // ---------- honesty test ----------
 
@@ -796,6 +983,7 @@
     document.querySelectorAll('[data-limit="mb"]').forEach(function (node) {
       node.textContent = config.limits.max_upload_mb + ' MB';
     });
+    $('gemma-off').hidden = config.gemma !== 'off';
     if (config.tabpfn === 'off') {
       var go = $('go');
       go.classList.add('off');

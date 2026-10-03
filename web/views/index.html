@@ -6,7 +6,7 @@
 <title>Shop Stock Predictor</title>
 <meta name="description" content="Tells a small shop what will run out this week and how much to order, from the two reports its billing app already makes.">
 <meta name="theme-color" content="#C2161E">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='27' fill='%23fff' stroke='%23111' stroke-width='2'/%3E%3Crect x='3' y='3' width='26' height='7' fill='%23C2161E'/%3E%3Ccircle cx='16' cy='6.5' r='2' fill='%23fff'/%3E%3Ctext x='16' y='27' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='16' fill='%231A3A9A'%3E7%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='27' fill='%23fff' stroke='%23111' stroke-width='2'/%3E%3Crect x='3' y='3' width='26' height='7' fill='%23C2161E'/%3E%3Ccircle cx='16' cy='6.5' r='2' fill='%23fff'/%3E%3Cpath d='M11 15.5h10l-6.5 12' fill='none' stroke='%231A3A9A' stroke-width='3.2' stroke-linecap='square' stroke-linejoin='miter'/%3E%3C/svg%3E">
 <link rel="preload" href="fonts/anek-devanagari-var-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <script>
@@ -162,6 +162,7 @@
           <label><input type="radio" name="lang" value="Hinglish"><span>Hinglish</span></label>
         </fieldset>
         <div class="say" id="say" aria-live="polite"><p class="say-idle">Add the two reports above, or try the sample, and every item that will run out is written on the day it runs out.</p></div>
+        <p class="gemma-off" id="gemma-off" hidden>Gemma is off on this server, so every line is the plain sentence.</p>
       </div>
     </div>
 
@@ -197,8 +198,22 @@
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 7V2h10v5M5 14H2V7h16v7h-3M5 11h10v7H5z"/></svg>
             <span class="bl"><span lang="hi" class="bl-hi">ऑर्डर शीट प्रिंट करें</span><span class="bl-en">Print the order sheet</span></span>
           </button>
+          <button type="button" id="receipt" hidden>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 2h12v16l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5-2 1.5zM7 6h6M7 9h6M7 12h3"/></svg>
+            <span class="bl"><span lang="hi" class="bl-hi">रसीद प्रिंट करें</span><span class="bl-en">Print on receipt printer</span></span>
+          </button>
+          <fieldset class="lang paper" id="paper" hidden>
+            <legend>Receipt paper</legend>
+            <label><input type="radio" name="paper" value="2 inch (58 mm)" checked><span>2 inch</span></label>
+            <label><input type="radio" name="paper" value="3 inch (80 mm)"><span>3 inch</span></label>
+          </fieldset>
         </div>
         <p class="out-status" id="out-status" aria-live="polite"></p>
+        <div class="out-note" id="receipt-note" hidden>
+          <p>The receipt prints in English letters. These printers have no Hindi font.</p>
+          <button type="button" class="sample any-printer" id="any-printer">My printer is not in the list</button>
+        </div>
+        <p class="out-note" id="receipt-unsupported" hidden>Receipt printing works in Chrome or Edge on Android or a computer.</p>
         <div class="fallback" id="fallback" hidden>
           <label for="fallback-text">Copying is blocked in this browser. Select this text and copy it.</label>
           <textarea id="fallback-text" rows="8" readonly></textarea>

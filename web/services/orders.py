@@ -1,8 +1,9 @@
-"""The order list for the supplier, as WhatsApp text or a printable page."""
+"""The order list for the supplier, as WhatsApp text, a printable page or receipt printer bytes."""
 import pandas as pd
 
 from order_sheet import order_html, order_text
-from web.models import OrderRequest
+from thermal import PAPER_WIDTHS, order_receipt
+from web.models import OrderRequest, ReceiptRequest
 
 
 class OrderService:
@@ -19,3 +20,8 @@ class OrderService:
 
     def sheet(self, request: OrderRequest) -> str:
         return order_html(request.shop_name, request.address, self._order(request), self.today())
+
+    def receipt(self, request: ReceiptRequest) -> bytes:
+        """ESC/POS bytes, the same ones the laptop version sends to the printer."""
+        return order_receipt(request.shop_name, request.address, self._order(request), self.today(),
+                             PAPER_WIDTHS[request.paper])

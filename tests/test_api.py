@@ -266,6 +266,29 @@ def test_orders(client):
     assert client.post("/api/orders/text", json={"lines": "x"}).status_code == 422
 
 
+def test_order_receipt_is_the_laptop_receipt(client):
+    import thermal
+    from web.services.orders import OrderService
+
+    day = pd.Timestamp("2026-10-03")
+    client.app.state.orders = OrderService(today=lambda: day)
+    body = {"shop_name": "Sharma Store", "address": "Main Road, Jaipur", "lines": [
+        {"item": "Wire 2.5mm red coil long name", "quantity": 10}, {"item": "Switch", "quantity": 0},
+        {"item": "Bulb", "quantity": 4}]}
+    order = pd.DataFrame({"Item": ["Wire 2.5mm red coil long name", "Bulb"], "Quantity": [10.0, 4.0]})
+
+    two = client.post("/api/orders/receipt", json=body)
+    assert two.status_code == 200 and two.headers["content-type"] == "application/octet-stream"
+    assert two.content == thermal.order_receipt("Sharma Store", "Main Road, Jaipur", order, day, 32)
+
+    three = client.post("/api/orders/receipt", json={**body, "paper": "3 inch (80 mm)"})
+    assert three.content == thermal.order_receipt("Sharma Store", "Main Road, Jaipur", order, day, 48)
+    assert b"\n" + b"-" * 48 + b"\n" in three.content and b"-" * 49 not in three.content
+
+    bad = client.post("/api/orders/receipt", json={**body, "paper": "4 inch"})
+    assert bad.status_code == 422 and "paper" in bad.json()["problem"]
+
+
 def test_page_and_its_files_are_served(client):
     page = client.get("/")
     assert page.status_code == 200 and "<title>Shop Stock Predictor</title>" in page.text
