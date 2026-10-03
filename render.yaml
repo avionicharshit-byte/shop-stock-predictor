@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: shop-stock-predictor
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: TABPFN_BACKEND
+        value: api
+      - key: TABPFN_TOKEN
+        sync: false
+      - key: GEMMA_API_KEY
+        sync: false
+      - key: GEMMA_MODEL
+        value: gemma-4-26b-a4b-it

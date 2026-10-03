@@ -1,0 +1,13 @@
+.git
+.venv
+.venv-web
+__pycache__
+*.pyc
+.pytest_cache
+data/real_*
+docs
+tests
+README.md
+.streamlit
+Dockerfile
+render.yaml
