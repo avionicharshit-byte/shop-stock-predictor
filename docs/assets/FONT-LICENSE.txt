@@ -1,20 +1,10 @@
-The two typefaces used by the README pictures are both under the SIL Open Font
-License, Version 1.1, which allows the embedded subsets in docs/assets/*.svg.
+The README pictures flow.svg and results.svg embed latin subsets of two typefaces,
+both under the SIL Open Font License, Version 1.1.
 
-Schibsted Grotesk, Copyright 2021 The Schibsted Grotesk Project Authors
-https://github.com/hanken-design/schibsted-grotesk
+Mukta, Copyright (c) 2014, Girish Dalvi, Ek Type.
+Rozha One, Copyright (c) 2014, Indian Type Foundry.
 
-IBM Plex Mono, Copyright 2017 IBM Corp.
-https://github.com/IBM/plex
-
-Full text of the licence, as shipped with Schibsted Grotesk:
-
-Copyright 2023 The Schibsted-Grotesk Project Authors (https://github.com/schibsted/schibsted-grotesk)
-
-This Font Software is licensed under the SIL Open Font License, Version 1.1.
-This license is copied below, and is also available with a FAQ at:
-https://scripts.sil.org/OFL
-
+The same font files ship with the website in web/views/fonts/. Full text of the licence:
 
 -----------------------------------------------------------
 SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
