@@ -76,8 +76,9 @@ def forecast(history: pd.DataFrame, days: int = HORIZON_DAYS,
 
 def weekly_need(predicted: pd.DataFrame) -> pd.DataFrame:
     """Per item: what will likely sell over the predicted days, and what a busy week would sell."""
-    # adding up seven busy days should overshoot a busy week in theory. measured on hidden weeks it did not:
-    # it covered 7 to 8 items in 10, close to the 8 in 10 aimed for, while a shrunk version covered only 6
+    # adding up seven busy days should overshoot a busy week in theory. measured on hidden weeks it does not:
+    # it covered 7 to 8 items in 10 on one month of a real shop and 66 percent on three months, short of the
+    # 8 in 10 aimed for. a shrunk version covered only 6, so this stays. slow sellers are the gap
     return predicted.groupby("item").agg(likely=("predicted_qty", "sum"), busy_week=("busy_qty", "sum")).reset_index()
 
 
