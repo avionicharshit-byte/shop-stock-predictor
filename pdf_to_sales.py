@@ -12,11 +12,14 @@ BILL = re.compile(r"^\s*\d{2}:\d{2} [AP]M · (\d{2} \w{3} \d{4})\s+BILL #")
 ENTRY = re.compile(r"^\s*\d{2}:\d{2} [AP]M · \d{2} \w{3} \d{4}")
 ITEM = re.compile(r"^\s*(.+?)\s{2,}(\d+(?:\.\d+)?)\s+₹([\d,.]+)\s+₹([\d,.]+)\s*$")
 SHOP = re.compile(r"^\s*(.+?)\s{2,}Sales report")
+PDFTOTEXT_TIMEOUT = 60  # seconds
 
 
 def read_bills(pdf: bytes) -> tuple[pd.DataFrame, str | None]:
     """Returns (one row per bill line, shop name)."""
-    text = subprocess.run(["pdftotext", "-layout", "-", "-"], input=pdf, capture_output=True, check=True).stdout.decode()
+    # a timeout, since a hosted upload can be any file at all
+    text = subprocess.run(["pdftotext", "-layout", "-", "-"], input=pdf, capture_output=True, check=True,
+                          timeout=PDFTOTEXT_TIMEOUT).stdout.decode()
     rows, bill_date, shop_name = [], None, None
     for line in text.splitlines():
         if shop_name is None and (shop := SHOP.match(line)):

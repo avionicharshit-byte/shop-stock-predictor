@@ -1,4 +1,6 @@
 import re
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
 import requests
@@ -76,30 +78,54 @@ def _keeps_the_facts(line: str, row) -> bool:
             and not any(char.isdigit() for char in line) and line.count("[") == len(slots))
 
 
-def _reworded(row, language: str) -> str | None:
-    examples = "\n\n".join(f"Alert: {alert}\n{language}: {reworded}" for alert, reworded in EXAMPLES[language])
-    prompt = (f"Rewrite each stock alert for an Indian shopkeeper in {language}. Keep every [SLOT] exactly as it is "
-              f"and keep the same day.\n\n{examples}\n\nAlert: "
-              + _template(row).format(day=_day(row), **SLOTS) + f"\n{language}:")
+def ask_ollama(prompt: str) -> str | None:
+    """Gemma on this laptop through Ollama. None when it does not answer."""
     try:
         reply = requests.post(OLLAMA_URL, json={"model": MODEL, "prompt": prompt, "stream": False,
                                                  "options": {"temperature": 0.2}}, timeout=180)
         reply.raise_for_status()
-        line = reply.json()["response"].strip().strip('"')
+        return reply.json()["response"]
     except (requests.RequestException, KeyError):
         return None
-    if "\n" in line or not _keeps_the_facts(line, row):
-        return None
-    return _fill(line, row)
 
 
-def friendly_note(plan: pd.DataFrame, language: str = "Hindi") -> tuple[str, int]:
+Ask = Callable[[str], str | None]  # sends a prompt to Gemma, wherever it runs, and returns its reply or None
+
+
+def _reworded(row, language: str, ask: Ask = ask_ollama) -> str | None:
+    examples = "\n\n".join(f"Alert: {alert}\n{language}: {reworded}" for alert, reworded in EXAMPLES[language])
+    prompt = (f"Rewrite each stock alert for an Indian shopkeeper in {language}. Keep every [SLOT] exactly as it is "
+              f"and keep the same day.\n\n{examples}\n\nAlert: "
+              + _template(row).format(day=_day(row), **SLOTS) + f"\n{language}:")
+    # a line that fails the fact check is asked for once more, then it stays plain
+    for _ in range(2):
+        reply = ask(prompt)
+        if not isinstance(reply, str):
+            return None  # no answer at all. retrying that belongs to ask, which knows why
+        line = reply.strip().strip('"')
+        if "\n" not in line and _keeps_the_facts(line, row):
+            return _fill(line, row)
+    return None
+
+
+def friendly_lines(plan: pd.DataFrame, language: str = "Hindi", ask: Ask | None = ask_ollama,
+                   workers: int = 1) -> list[tuple[str, str | None]]:
+    """(plain line, AI line or None) per plan row. ask=None skips the AI and keeps every line plain.
+
+    workers above 1 sends that many lines at once, for a Gemma that runs elsewhere.
+    """
+    rows = list(plan.itertuples())
+    if not ask:
+        return [(_plain_line(row), None) for row in rows]
+    with ThreadPoolExecutor(max(1, workers)) as pool:
+        worded = list(pool.map(lambda row: _reworded(row, language, ask), rows))
+    return [(_plain_line(row), line) for row, line in zip(rows, worded)]
+
+
+def friendly_note(plan: pd.DataFrame, language: str = "Hindi", ask: Ask | None = ask_ollama,
+                  workers: int = 1) -> tuple[str, int]:
     """Returns (note, how many lines the AI wrote). A line that fails the fact check stays plain."""
     if plan.empty:
         return plain_note(plan), 0
-    lines, written_by_ai = [], 0
-    for row in plan.itertuples():
-        line = _reworded(row, language)
-        written_by_ai += line is not None
-        lines.append(line or _plain_line(row))
-    return "\n".join(lines), written_by_ai
+    lines = friendly_lines(plan, language, ask, workers)
+    return "\n".join(ai or plain for plain, ai in lines), sum(ai is not None for _, ai in lines)

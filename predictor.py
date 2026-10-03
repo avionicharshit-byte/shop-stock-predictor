@@ -1,11 +1,8 @@
 from collections.abc import Callable
+from concurrent.futures import Executor, ThreadPoolExecutor, as_completed
 
 import numpy as np
 import pandas as pd
-import torch
-from tabpfn import TabPFNRegressor
-from tabpfn.constants import ModelVersion
-from tabpfn.errors import TabPFNOutOfMemoryError
 
 from intake import DataProblem
 
@@ -39,7 +36,7 @@ def _calendar(dates: pd.Series, first_day: pd.Timestamp) -> pd.DataFrame:
         "day_of_month": dates.dt.day})
 
 
-def _guess_one_item(model: TabPFNRegressor, history: pd.DataFrame, future_dates: pd.Series) -> tuple:
+def _guess_one_item(model, history: pd.DataFrame, future_dates: pd.Series) -> tuple:
     """(likely qty, busy-day qty) for each future day. TabPFN reads this item's past days and answers in one go."""
     first_day = history["date"].min()
     model.fit(_calendar(history["date"], first_day), history["qty_sold"])
@@ -47,30 +44,101 @@ def _guess_one_item(model: TabPFNRegressor, history: pd.DataFrame, future_dates:
     return np.clip(answer["mean"], 0, None), np.clip(answer["quantiles"][0], 0, None)
 
 
-def forecast(history: pd.DataFrame, days: int = HORIZON_DAYS,
-             on_progress: Callable[[float], None] | None = None) -> pd.DataFrame:
-    """One row per item per future day: predicted_qty (most likely) and busy_qty (a busy day)."""
-    check_enough_days(history)
-    future_dates = pd.Series(pd.date_range(history["date"].max() + pd.Timedelta(days=1), periods=days))
-    # v2 is the openly licensed TabPFN, newer versions need an account and a licence click
-    model = TabPFNRegressor.create_default_for_version(ModelVersion.V2, ignore_pretraining_limits=True)
-    guesses = []
-    items = list(history.groupby("item"))
-    for number, (item, item_history) in enumerate(items, 1):
-        # each item gets its own small table. mixing all items in one table let big sellers
-        # distort the small ones, and it lost to a plain average on a public dataset
+class LocalTabPFN:
+    """TabPFN v2 on this machine, the laptop app's default. torch and tabpfn load only when it is used."""
+    workers = 1
+
+    def __init__(self):
+        self.model = None
+
+    @staticmethod
+    def _new_model(**options):
+        from tabpfn import TabPFNRegressor
+        from tabpfn.constants import ModelVersion
+        # v2 is the openly licensed TabPFN, newer versions need an account and a licence click
+        return TabPFNRegressor.create_default_for_version(ModelVersion.V2, ignore_pretraining_limits=True, **options)
+
+    def guess(self, history: pd.DataFrame, future_dates: pd.Series) -> tuple:
+        import torch
+        from tabpfn.errors import TabPFNOutOfMemoryError
+        if self.model is None:
+            self.model = self._new_model()
         try:
-            likely, busy = _guess_one_item(model, item_history, future_dates)
+            return _guess_one_item(self.model, history, future_dates)
         except (TabPFNOutOfMemoryError, torch.OutOfMemoryError):
             # Gemma shares the same graphics card. when it is full, the slower main processor does the job
             torch.cuda.empty_cache()
-            model = TabPFNRegressor.create_default_for_version(ModelVersion.V2, ignore_pretraining_limits=True, device="cpu")
-            likely, busy = _guess_one_item(model, item_history, future_dates)
-        guesses.append(pd.DataFrame({"date": future_dates, "item": item, "predicted_qty": likely, "busy_qty": busy}))
-        if on_progress:
-            on_progress(number / len(items))
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
+            self.model = self._new_model(device="cpu")
+            return _guess_one_item(self.model, history, future_dates)
+
+    def finish(self) -> None:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+
+class HostedTabPFN:
+    """TabPFN v2 run by Prior Labs, through tabpfn-client. Reads the TABPFN_TOKEN set for the process."""
+
+    def __init__(self, workers: int = 4):
+        # each call waits on the network, so a few items go at once
+        self.workers = workers
+
+    def guess(self, history: pd.DataFrame, future_dates: pd.Series) -> tuple:
+        from tabpfn_client import TabPFNRegressor
+        # a fresh model per item, so items running side by side never share one
+        model = TabPFNRegressor.create_default_for_version("v2", ignore_pretraining_limits=True)
+        return _guess_one_item(model, history, future_dates)
+
+    def finish(self) -> None:
+        pass
+
+
+def forecast(history: pd.DataFrame, days: int = HORIZON_DAYS,
+             on_progress: Callable[[float], None] | None = None, provider=None,
+             pool: Executor | None = None) -> pd.DataFrame:
+    """One row per item per future day: predicted_qty (most likely) and busy_qty (a busy day).
+
+    provider runs TabPFN: LocalTabPFN (the default) or HostedTabPFN, anything with guess() and finish().
+    pool, when given, runs the items instead of a pool of provider.workers, so two forecasts can share one.
+    """
+    check_enough_days(history)
+    future_dates = pd.Series(pd.date_range(history["date"].max() + pd.Timedelta(days=1), periods=days))
+    provider = provider or LocalTabPFN()
+    items = list(history.groupby("item"))
+
+    def guess(item, item_history) -> pd.DataFrame:
+        # each item gets its own small table. mixing all items in one table let big sellers
+        # distort the small ones, and it lost to a plain average on a public dataset
+        likely, busy = provider.guess(item_history, future_dates)
+        return pd.DataFrame({"date": future_dates, "item": item, "predicted_qty": likely, "busy_qty": busy})
+
+    def run_in(runner: Executor) -> None:
+        running = [runner.submit(guess, item, item_history) for item, item_history in items]
+        try:
+            for number, done in enumerate(as_completed(running), 1):
+                guesses.append(done.result())
+                if on_progress:
+                    on_progress(number / len(items))
+        except BaseException:
+            # only this forecast's calls are dropped, a shared pool keeps serving the other one
+            for waiting in running:
+                waiting.cancel()
+            raise
+        guesses.sort(key=lambda table: table["item"].iloc[0])  # same order as one by one
+
+    guesses = []
+    if pool is not None:
+        run_in(pool)
+    elif getattr(provider, "workers", 1) <= 1:
+        for number, (item, item_history) in enumerate(items, 1):
+            guesses.append(guess(item, item_history))
+            if on_progress:
+                on_progress(number / len(items))
+    else:
+        with ThreadPoolExecutor(provider.workers) as own_pool:
+            run_in(own_pool)
+    provider.finish()
     return pd.concat(guesses, ignore_index=True)
 
 
@@ -83,7 +151,8 @@ def weekly_need(predicted: pd.DataFrame) -> pd.DataFrame:
 
 
 def honesty_test(sales: pd.DataFrame, days: int = HORIZON_DAYS,
-                 on_progress: Callable[[float], None] | None = None) -> dict:
+                 on_progress: Callable[[float], None] | None = None, provider=None,
+                 pool: Executor | None = None) -> dict:
     # hide the last `days`, predict them, and score TabPFN against two guesses that need no AI
     days_of_sales = sales["date"].nunique()
     if days_of_sales < days + MIN_DAYS_TO_PREDICT:
@@ -91,7 +160,7 @@ def honesty_test(sales: pd.DataFrame, days: int = HORIZON_DAYS,
                           f"(a week to hide and a week to learn from), this file covers {days_of_sales}.")
     cutoff = sales["date"].max() - pd.Timedelta(days=days)
     history, hidden = sales[sales["date"] <= cutoff], sales[sales["date"] > cutoff]
-    predicted = forecast(history, days, on_progress)
+    predicted = forecast(history, days, on_progress, provider, pool)
     result = hidden.merge(predicted, on=["date", "item"])
     result["plain"] = result["item"].map(history.groupby("item")["qty_sold"].mean())
     same_weekday = history.assign(weekday=history["date"].dt.dayofweek).groupby(["item", "weekday"])["qty_sold"].mean()
