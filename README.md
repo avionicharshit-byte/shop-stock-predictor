@@ -92,5 +92,14 @@ Needs Python 3.12, [Ollama](https://ollama.com) and `pdftotext` (`poppler-utils`
 - Receipt printing from the website needs Chrome or Edge on Android or a computer, not iPhone,
   Safari or Firefox. The laptop version prints on Linux only (BlueZ with `Experimental = true`).
   Both were tested on one 2 inch PSF588 printer, and receipts print in English letters only.
-- The website checks at most 40 items per run and files up to 5 MB, keeps nothing on disk and
-  forgets results after 30 minutes.
+- On a big shop the website checks the 25 items closest to running out, picked by a plain
+  average, and files up to 5 MB. It keeps nothing on disk and forgets results after 30 minutes.
+- The website runs on free quotas, so live checks are limited each day. When the quota is used up
+  the page says so, and the recorded sample run still works.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
+The fonts in the diagrams and on the site (Mukta, Rozha One, Anek Devanagari) are under the SIL
+Open Font License 1.1, see `docs/assets/FONT-LICENSE.txt` and the `OFL.txt` in each folder under
+`web/views/fonts/`.
