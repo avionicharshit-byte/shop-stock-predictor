@@ -6,6 +6,7 @@ from conftest import ROOT, FakeTabPFN, make_client, wait_for
 from core.intake import load_sales, load_stock
 from core.predictor import forecast, split_rare_items
 from core.reorder import reorder_plan
+from web.services.stock_check import closest_to_running_out
 
 SALES, STOCK = str(ROOT / "data" / "sample_sales.csv"), str(ROOT / "data" / "sample_stock.csv")
 
@@ -18,7 +19,7 @@ def test_health_and_config(client):
     assert client.get("/healthz").json() == {"ok": True}
     config = client.get("/api/config").json()
     assert config["languages"] == ["Hindi", "English", "Hinglish"]
-    assert config["limits"] == {"max_items": 40, "max_upload_mb": 5.0, "horizon_days": 7}
+    assert config["limits"] == {"max_items": 25, "max_upload_mb": 5.0, "horizon_days": 7}
 
 
 def test_samples_download(client):
@@ -69,7 +70,7 @@ def test_note_marks_each_line_gemma_worded():
     job_id = client.post("/api/checks", data={"use_sample": "true", "language": "English"}).json()["job_id"]
     result = wait_for(client, job_id)["result"]
     note = client.post(f"/api/checks/{job_id}/note", json={"language": "Hinglish"}).json()
-    assert set(note) == {"lines", "worded_by_ai", "plan"}
+    assert set(note) == {"lines", "worded_by_ai", "plan", "gemma_limited"} and not note["gemma_limited"]
     assert [line["item"] for line in note["plan"]] == [line["item"] for line in result["plan"]]
     for line, text in zip(note["plan"], note["lines"]):
         assert set(line) == {"item", "line", "line_plain", "by_ai"} and line["line"] == text
@@ -189,13 +190,13 @@ def test_upload_checks(client):
     assert reply.status_code == 422
 
 
-def test_item_cap_keeps_top_sellers():
+def test_item_cap_keeps_items_closest_to_running_out():
     client = make_client(max_items=3)
     status = wait_for(client, client.post("/api/checks", data={"use_sample": "true"}).json()["job_id"])
     result = status["result"]
-    assert result["capped"] == {"kept": 3, "dropped": 7}
-    top = load_sales(SALES).groupby("item")["qty_sold"].sum().nlargest(3).index
-    assert {line["item"] for line in result["plan"]} <= set(top)
+    assert result["capped"]["kept"] == 3 and result["capped"]["dropped"] == 7
+    kept = closest_to_running_out(split_rare_items(load_sales(SALES))[0], load_stock(STOCK), 3)
+    assert {line["item"] for line in result["plan"]} <= set(kept)
     assert result["items_checked"] == 3 and len(result["honesty"]["per_item"]) == 3
 
 

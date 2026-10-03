@@ -17,4 +17,5 @@ def config(request: Request) -> AppConfig:
     settings = state.settings
     return AppConfig(tabpfn=state.forecasting.status(), gemma=state.wording_gateway.status(), languages=LANGUAGES,
                      limits=Limits(max_items=settings.max_items, max_upload_mb=settings.max_upload_mb,
-                                   horizon_days=settings.horizon_days))
+                                   horizon_days=settings.horizon_days),
+                     quota=state.quota.outlook(), recorded_sample=state.checks.recorded_sample() is not None)

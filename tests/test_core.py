@@ -34,7 +34,7 @@ def test_parallel_forecast_matches_one_by_one():
 
 def test_settings_from_env():
     assert Settings.from_env({}).gemma_backend == "off"
-    assert Settings.from_env({}).max_items == 40
+    assert Settings.from_env({}).max_items == 25
     env = Settings.from_env({"GEMMA_API_KEY": "k", "TABPFN_BACKEND": "local", "RUN_HONESTY": "false", "PORT": "8000"})
     assert (env.gemma_backend, env.max_items, env.run_honesty, env.port) == ("google", None, False, 8000)
     assert Settings.from_env({"MAX_ITEMS": "0"}).max_items is None

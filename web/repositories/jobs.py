@@ -23,9 +23,16 @@ class Job:
     progress: float = 0.0
     result: object = None
     problem: str | None = None
+    quota: bool = False  # failed because a free quota ran out
+    items: int = 0  # items the model looks at
+    predicted: int = 0  # items forecast so far
+    tested: int = 0  # items through the honesty test so far
+    eta_seconds: int | None = None  # model time left, once a few calls are timed
+    estimate_seconds: int | None = None  # model time for the whole check, from the same timing
     finished: float | None = None
     plan: object = None  # the plan table, kept to word it again in another language
     notes: dict = field(default_factory=dict)  # language -> worded lines
+    recorded: object = None  # the saved sample run this job answers from, instead of the models
     lock: threading.Lock = field(default_factory=threading.Lock)
 
     @property
@@ -75,6 +82,16 @@ class JobStore:
             job = Job(id=secrets.token_urlsafe(12), owner=owner, language=language, created=now)
             self._jobs[job.id] = job
             self._started[owner].append(now)
+            return job
+
+    def add_recorded(self, owner: str, language: str, result, recorded) -> Job:
+        """A finished job that answers from a saved run. It costs nothing, so the visitor limits do not count it."""
+        with self._lock:
+            now = self.clock()
+            self._forget_old(now)
+            job = Job(id=secrets.token_urlsafe(12), owner=owner, language=language, created=now, state="done",
+                      stage="wording", progress=1.0, result=result, finished=now, recorded=recorded)
+            self._jobs[job.id] = job
             return job
 
     def get(self, job_id: str) -> Job | None:

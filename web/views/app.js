@@ -14,6 +14,8 @@
   var LANG_ATTR = { Hindi: 'hi', English: 'en', Hinglish: 'hi-Latn' };
   var TICKS = 25;
   var POLL_MS = 1500;
+  var TIMEOUT_MS = 20000; // each request gives up after this
+  var POLL_GIVE_UP_MS = 4 * 60 * 1000; // a check that runs longer than this is given up on
   var NS = 'http://www.w3.org/2000/svg';
 
   var $ = function (id) { return document.getElementById(id); };
@@ -33,6 +35,8 @@
     linesLanguage: null,
     linesByAi: [],
     wordedByAi: 0,
+    gemmaLimited: false,
+    quotaOut: false,
     printing: false
   };
 
@@ -81,6 +85,35 @@
   function short(date) { return date.getDate() + ' ' + EN_MONTHS[date.getMonth()].slice(0, 3); }
   function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
   function cleanNumber(x) { return Number(x).toFixed(2); }
+
+  // every request ends: it answers, fails, or is cut off after TIMEOUT_MS
+  function timedFetch(url, options) {
+    var controller = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = controller ? setTimeout(function () { controller.abort(); }, TIMEOUT_MS) : null;
+    var opts = {};
+    Object.keys(options || {}).forEach(function (key) { opts[key] = options[key]; });
+    if (controller) opts.signal = controller.signal;
+    var done = function () { if (timer) clearTimeout(timer); };
+    return fetch(url, opts).then(function (reply) { done(); return reply; }, function (error) { done(); throw error; });
+  }
+
+  // the status and the JSON body, with the body read inside the same time limit
+  function timedJson(url, options) {
+    var controller = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = controller ? setTimeout(function () { controller.abort(); }, TIMEOUT_MS) : null;
+    var opts = {};
+    Object.keys(options || {}).forEach(function (key) { opts[key] = options[key]; });
+    if (controller) opts.signal = controller.signal;
+    var done = function () { if (timer) clearTimeout(timer); };
+    return fetch(url, opts).then(function (reply) {
+      return reply.json().catch(function () { return {}; }).then(function (body) {
+        done();
+        return { status: reply.status, ok: reply.ok, body: body || {} };
+      });
+    }).catch(function (error) { done(); throw error; });
+  }
+
+  function timedOut(error) { return !!(error && error.name === 'AbortError'); }
 
   // ---------- today's leaf ----------
 
@@ -183,10 +216,14 @@
 
   // ---------- problems, busy state, progress ----------
 
-  function showProblem(text, next) {
+  function recordedOk() { return !state.config || state.config.recorded_sample !== false; }
+
+  // withSample adds the way out that always works: the recorded sample run
+  function showProblem(text, next, withSample) {
     $('problem-text').textContent = text;
     $('problem-next').textContent = next || '';
     $('problem-next').hidden = !next;
+    $('problem-action').hidden = !(withSample && recordedOk());
     $('problem').hidden = false;
   }
   function hideProblem() { $('problem').hidden = true; }
@@ -206,10 +243,35 @@
   var ticks = $('ticks');
   for (var t = 0; t < TICKS; t++) ticks.appendChild(el('i'));
 
-  function setProgress(stage, progress) {
+  // whole seconds, rounded to 5 so the number does not flicker on every poll
+  function aboutSeconds(seconds) {
+    var s = Math.max(5, Math.round(seconds / 5) * 5);
+    return s + ' seconds';
+  }
+
+  // the counted line under the stage words, and the time a check of this size takes
+  function setCount(stage, body) {
+    var count = $('run-count'), items = body && body.items;
+    var text = '';
+    if (items && stage === 'predicting') text = 'Predicted ' + body.predicted + ' of ' + items + ' items.';
+    else if (items && stage === 'testing') text = 'Tested ' + body.tested + ' of ' + items + ' items against last week.';
+    else if (items && stage === 'wording') text = 'Predicted all ' + items + ' items.';
+    if (text && stage !== 'wording' && body.eta_seconds != null) {
+      text += body.eta_seconds >= 5 ? ' About ' + aboutSeconds(body.eta_seconds) + ' left.' : ' Almost done.';
+    }
+    if (count.textContent !== text) count.textContent = text;
+    count.hidden = !text;
+    var time = items && body.estimate_seconds != null
+      ? ' ' + items + ' ' + (items === 1 ? 'item takes' : 'items take') + ' about ' + aboutSeconds(body.estimate_seconds) + '.'
+      : '';
+    if ($('run-time').textContent !== time) $('run-time').textContent = time;
+  }
+
+  function setProgress(stage, progress, body) {
     var info = STAGES[stage] || STAGES.reading;
     var pct = Math.max(0, Math.min(100, Math.round((progress || 0) * 100)));
     if ($('run-stage').textContent !== info[0]) $('run-stage').textContent = info[0];
+    setCount(stage, body);
     $('run-step').textContent = String(info[1]);
     ticks.setAttribute('aria-valuenow', String(pct));
     ticks.setAttribute('aria-valuetext', info[0] + ', ' + pct + ' percent');
@@ -220,13 +282,14 @@
     Array.prototype.forEach.call(ticks.children, function (cell, i) { cell.classList.toggle('on', i < (shown === TICKS ? on : onShown)); });
   }
 
-  function setBusy(busy, label) {
+  // quiet keeps the running stages hidden, for a sample that may answer from the recorded run at once
+  function setBusy(busy, label, quiet) {
     state.busy = busy;
     var go = $('go');
-    go.disabled = busy || checksOff();
+    go.disabled = busy || checksOff() || state.quotaOut;
     go.setAttribute('aria-busy', busy ? 'true' : 'false');
-    $('sample').disabled = busy || checksOff();
-    $('run').hidden = !busy;
+    $('sample').disabled = busy || (checksOff() && !(state.config && state.config.recorded_sample));
+    $('run').hidden = !busy || !!quiet;
     $('go-en').textContent = busy ? (label || 'Checking the stock') : (state.questions.length ? 'Check again with these columns' : 'Check the stock');
   }
 
@@ -235,7 +298,10 @@
   // ---------- starting and following a check ----------
 
   function startCheck(useSample) {
-    if (state.busy || checksOff()) return;
+    if (state.busy) return;
+    // the recorded sample needs no model, so it still works when checks are off or the quota is used up
+    if (checksOff() && !(useSample && state.config.recorded_sample)) return;
+    if (state.quotaOut && !useSample) return;
     hideProblem();
     var form = new FormData();
     state.lastSample = useSample;
@@ -261,69 +327,96 @@
       }
     }
     form.append('language', state.language);
-    setBusy(true, useSample ? 'Checking the sample' : 'Checking your stock');
+    setBusy(true, useSample ? 'Checking the sample' : 'Checking your stock', useSample);
     setProgress('reading', 0);
 
-    fetch('/api/checks', { method: 'POST', body: form }).then(function (reply) {
-      return reply.json().catch(function () { return {}; }).then(function (body) {
-        if (reply.status === 202 && body.job_id) {
-          state.jobId = body.job_id;
-          if (!useSample) { state.questions = []; renderQuestions(); }
-          poll(body.job_id, 0);
-          return;
-        }
-        setBusy(false);
-        if (reply.status === 422 && body.needs_columns && body.needs_columns.length) {
-          state.questions = body.needs_columns;
-          renderQuestions();
-          setBusy(false);
-          var first = $('ask-list').querySelector('select');
-          if (first) first.focus();
-          return;
-        }
-        showProblem(body.problem || ('The server answered with an error (' + reply.status + ').'), nextStepFor(reply.status));
-      });
-    }).catch(function () {
+    timedJson('/api/checks', { method: 'POST', body: form }).then(function (reply) {
+      var body = reply.body;
+      if (reply.status === 202 && body.job_id) {
+        state.jobId = body.job_id;
+        if (!useSample) { state.questions = []; renderQuestions(); }
+        if (body.recorded) { poll(body.job_id, 0, Date.now(), 0); return; } // already done, read it at once
+        $('run').hidden = false;
+        poll(body.job_id, 0, Date.now());
+        return;
+      }
       setBusy(false);
-      showProblem('Could not reach the server.', 'It may still be waking up, which can take about a minute. Wait a moment and press the button again.');
+      if (reply.status === 422 && body.needs_columns && body.needs_columns.length) {
+        state.questions = body.needs_columns;
+        renderQuestions();
+        var first = $('ask-list').querySelector('select');
+        if (first) first.focus();
+        return;
+      }
+      if (body.quota) {
+        showQuotaUsedUp();
+        showProblem(body.problem, '', true);
+        return;
+      }
+      showProblem(body.problem || ('The server answered with an error (' + reply.status + ').'), nextStepFor(reply.status));
+    }).catch(function (error) {
+      setBusy(false);
+      if (timedOut(error)) {
+        showProblem('The server did not answer in time.', 'Try again in a few minutes.', !useSample);
+      } else {
+        showProblem('Could not reach the server.', 'It may still be waking up, which can take about a minute. Wait a moment and press the button again.', !useSample);
+      }
     });
   }
 
-  function poll(jobId, failures) {
+  function poll(jobId, failures, started, wait) {
     setTimeout(function () {
       if (jobId !== state.jobId) return;
-      fetch('/api/checks/' + encodeURIComponent(jobId)).then(function (reply) {
-        return reply.json().catch(function () { return {}; }).then(function (body) {
-          if (reply.status === 404) {
-            setBusy(false);
-            showProblem(body.problem || 'This check is no longer on the server.', nextStepFor(404));
-            return;
-          }
-          if (!reply.ok) throw new Error('status ' + reply.status);
-          if (body.state === 'done') {
-            setProgress('wording', 1);
-            setBusy(false);
-            showResult(body.result);
-            return;
-          }
-          if (body.state === 'failed') {
-            setBusy(false);
-            showProblem(body.problem || 'The check stopped halfway.', 'Nothing was kept. Try again in a few minutes.');
-            return;
-          }
-          setProgress(body.stage, body.progress);
-          poll(jobId, 0);
-        });
-      }).catch(function () {
-        if (failures < 4) { poll(jobId, failures + 1); return; }
+      if (Date.now() - started > POLL_GIVE_UP_MS) {
+        state.jobId = null;
         setBusy(false);
-        showProblem('Lost touch with the server while the check was running.', 'Check your connection, then run the check again.');
+        showProblem('The check is taking far longer than it should, so I stopped waiting for it.', 'Try again in a few minutes.', true);
+        return;
+      }
+      timedJson('/api/checks/' + encodeURIComponent(jobId)).then(function (reply) {
+        var body = reply.body;
+        if (jobId !== state.jobId) return;
+        if (reply.status === 404) {
+          setBusy(false);
+          showProblem(body.problem || 'This check is no longer on the server.', nextStepFor(404));
+          return;
+        }
+        if (!reply.ok) throw new Error('status ' + reply.status);
+        if (body.state === 'done') {
+          setProgress('wording', 1);
+          setBusy(false);
+          showResult(body.result);
+          return;
+        }
+        if (body.state === 'failed') {
+          setBusy(false);
+          if (body.quota) {
+            showQuotaUsedUp();
+            showProblem(body.problem, '', true);
+          } else {
+            showProblem(body.problem || 'The check stopped halfway.', 'Nothing was kept. Try again in a few minutes.', true);
+          }
+          return;
+        }
+        $('run').hidden = false;
+        setProgress(body.stage, body.progress, body);
+        poll(jobId, 0, started);
+      }).catch(function () {
+        if (jobId !== state.jobId) return;
+        if (failures < 4) { poll(jobId, failures + 1, started); return; }
+        state.jobId = null;
+        setBusy(false);
+        showProblem('Lost touch with the server while the check was running.', 'Check your connection, then run the check again.', true);
       });
-    }, POLL_MS);
+    }, wait === undefined ? POLL_MS : wait);
   }
 
   $('check').addEventListener('submit', function (event) { event.preventDefault(); startCheck(false); });
   $('sample').addEventListener('click', function () { startCheck(true); });
+  $('problem-action').addEventListener('click', function () {
+    state.jobId = null;
+    startCheck(true);
+  });
 
   // ---------- the week ----------
 
@@ -396,6 +489,13 @@
     $('week-stamp').textContent = 'Week of ' + short(start) + ' to ' + short(end) + ', the 7 days after ' +
       (state.resultSample ? "the sample's last sale" : 'your last sale');
     $('sample-stamp').hidden = !state.resultSample;
+    var recordedNote = $('recorded-note');
+    recordedNote.hidden = !result.recorded;
+    if (result.recorded && result.recorded_on) {
+      var on = parseDay(result.recorded_on);
+      recordedNote.textContent = 'Recorded run from ' + short(on) + ' ' + on.getFullYear() +
+        '. Upload the two sample files to run it live.';
+    }
 
     var byDay = {};
     var gone = [];
@@ -459,6 +559,7 @@
     say.textContent = '';
     var total = state.result.plan.length;
     if (!total) {
+      $('gemma-limited').hidden = true;
       say.appendChild(el('p', { class: 'say-big', text: 'Nothing to order this week.' }));
       say.appendChild(el('p', { class: 'say-small', text: 'Every checked item has enough stock for the next 7 days.' }));
       return;
@@ -474,6 +575,7 @@
       ]));
     }
     say.appendChild(small);
+    $('gemma-limited').hidden = !state.gemmaLimited;
   }
 
   // ---------- small print under the week ----------
@@ -493,9 +595,9 @@
     var box = $('lists');
     box.textContent = '';
     if (r.capped) {
-      var max = r.capped.kept;
-      box.appendChild(el('p', { text: 'This online demo checks at most ' + max + ' items, so it kept the ' + max +
-        ' best sellers and left out ' + plural(r.capped.dropped, 'item', 'items') + '. The laptop version checks every item.' }));
+      var capText = r.capped.text || ('This online check looked at the ' + r.capped.kept + ' items closest to running out, ' +
+        'picked by a plain average. ' + r.capped.dropped + ' other ' + (r.capped.dropped === 1 ? 'item was' : 'items were') + ' left out.');
+      box.appendChild(el('p', { text: capText + ' The laptop version checks every item.' }));
     }
     if (r.notes.length) box.appendChild(fine('notes on what was left out of the files, and why', r.notes.length, r.notes, true));
     if (r.enough_stock.length) {
@@ -582,7 +684,7 @@
   }
 
   function post(url, body) {
-    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return timedFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   }
 
   function outProblem(text) {
@@ -874,6 +976,7 @@
       el('p', { text: 'The two averages need no AI. They are the guesses TabPFN has to beat. It does not always win, least of all with only a few weeks of sales.' }),
       el('p', { text: 'A sudden bulk sale, like one customer buying a lot of wire, is something no guess can see coming.' })
     ]);
+    if (r.capped) notes.appendChild(el('p', { text: 'This test covers only the items picked above, so it is not a score for the whole shop.' }));
     box.appendChild(el('div', { class: 'honest-grid' }, [table, notes]));
 
     var per = el('table', { class: 'ledger' }, [
@@ -913,6 +1016,7 @@
     state.linesLanguage = result.language;
     state.linesByAi = result.plan.map(function (line) { return line.by_ai; });
     state.wordedByAi = result.worded_by_ai;
+    state.gemmaLimited = !!result.gemma_limited;
     setLanguageRadio(result.language);
 
     var summary = (result.shop_name ? result.shop_name + ': r' : 'R') + 'ead sales of ' + plural(result.items_sold, 'item', 'items') +
@@ -958,6 +1062,7 @@
         state.linesByAi = (data.plan || []).map(function (line) { return line.by_ai; });
         state.language = language;
         state.wordedByAi = data.worded_by_ai;
+        state.gemmaLimited = !!data.gemma_limited;
         renderWeek(false);
       }).catch(function (error) {
         setLanguageRadio(previous);
@@ -989,11 +1094,40 @@
       go.classList.add('off');
       setBusy(false);
       showProblem('Checks are switched off right now: the forecasting model is not set up on this server.',
-        'The measured results below still stand, and the laptop version runs fully on its own.');
+        'The measured results below still stand, and the laptop version runs fully on its own.', true);
     }
+    renderQuota(config.quota);
   }
 
-  fetch('/api/config').then(function (reply) { return reply.ok ? reply.json() : null; })
+  // ---------- the free quota ----------
+
+  function renderQuota(quota) {
+    var line = $('quota-line');
+    var left = quota ? quota.live_checks_left_today : null;
+    state.quotaOut = left === 0;
+    line.classList.toggle('used-up', state.quotaOut);
+    if (left === null || left === undefined) {
+      line.hidden = true;
+    } else if (left === 0) {
+      line.textContent = recordedOk()
+        ? "Today's free quota for live checks is used up. The recorded sample run still works."
+        : "Today's free quota for live checks is used up.";
+      line.hidden = false;
+    } else {
+      line.textContent = 'About ' + plural(left, 'live check', 'live checks') + ' left today on the free quota.';
+      line.hidden = false;
+    }
+    $('go').classList.toggle('off', state.quotaOut || checksOff());
+    $('sample').classList.toggle('lead', state.quotaOut && recordedOk());
+    if (!state.busy) setBusy(false);
+  }
+
+  function showQuotaUsedUp() {
+    var quota = state.config && state.config.quota ? state.config.quota : { resets: null };
+    renderQuota({ live_checks_left_today: 0, resets: quota.resets });
+  }
+
+  timedFetch('/api/config').then(function (reply) { return reply.ok ? reply.json() : null; })
     .then(function (config) { if (config) applyConfig(config); })
     .catch(function () { /* the check itself reports a dead server */ });
 

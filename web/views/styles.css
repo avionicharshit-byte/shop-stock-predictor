@@ -365,6 +365,7 @@ form.check { padding: 24px 32px 20px; display: flex; flex-direction: column; gap
 .ticks i { display: block; border: 1px solid var(--blue); background: var(--leaf); transition: background-color 300ms var(--ease); }
 .ticks i.on { background: var(--blue); }
 .run-hint { margin: 8px 0 0; font-size: 17px; }
+.run-count { margin: 0 0 8px; font-size: 17px; font-variant-numeric: tabular-nums; }
 
 .problem { display: grid; grid-template-columns: 28px 1fr; gap: 12px; border: 2px solid var(--red); padding: 12px 16px; }
 .problem svg { width: 26px; height: 26px; color: var(--red); margin-top: 2px; }
@@ -382,6 +383,11 @@ form.check { padding: 24px 32px 20px; display: flex; flex-direction: column; gap
 .sample:disabled { color: var(--ink); text-decoration: none; cursor: not-allowed; }
 .downloads, .privacy { margin: 0; font-size: 17px; max-width: 60ch; }
 .downloads a { padding: 8px 0; font-weight: 700; }
+/* the free quota, in small print by the slots. red only once it is used up */
+.quota-line { margin: 0; font-size: 17px; max-width: 60ch; }
+.quota-line.used-up { color: var(--red); font-weight: 700; }
+.sample.lead { font-size: 22px; text-decoration-thickness: 2px; }
+.problem .problem-action { margin-top: 2px; font-size: 18px; }
 
 /* small-print band along the bottom of the leaf */
 .print { display: grid; grid-template-columns: minmax(0, 44%) minmax(0, 1fr); border-top: 1px solid var(--ink); }
@@ -429,6 +435,7 @@ html.tear .prev {
   transform: rotate(-1deg);
 }
 .sample-stamp { color: var(--ink); border: 2px solid var(--ink); font-weight: 800; transform: rotate(-2deg); }
+.recorded-note { margin: 0 0 6px; font-size: 17px; font-weight: 700; max-width: 64ch; }
 .summary { margin: 0 var(--inset) 16px; font-size: 18px; max-width: 80ch; }
 
 .strip { margin: 0 var(--inset); border: 2px solid var(--ink); background: var(--ink); }

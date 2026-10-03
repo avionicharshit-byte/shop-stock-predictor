@@ -19,9 +19,10 @@ def start_check(request: Request, sales: UploadFile | None = File(None), stock: 
                 use_sample: bool = Form(False), language: str | None = Form(None),
                 columns: str | None = Form(None)) -> dict:
     max_bytes = request.app.state.settings.max_upload_bytes
-    job_id = request.app.state.checks.start(client_address(request), _upload(sales, max_bytes),
-                                            _upload(stock, max_bytes), use_sample, columns, language)
-    return {"job_id": job_id}
+    job = request.app.state.checks.start(client_address(request), _upload(sales, max_bytes),
+                                         _upload(stock, max_bytes), use_sample, columns, language)
+    # a recorded run is already done, the page reads it at once instead of showing the running stages
+    return {"job_id": job.id, "recorded": job.recorded is not None}
 
 
 @router.get("/{job_id}", response_model=JobStatus)

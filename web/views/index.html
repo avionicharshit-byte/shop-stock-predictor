@@ -79,6 +79,8 @@
               </button>
             </div>
 
+            <p class="quota-line" id="quota-line" aria-live="polite" hidden></p>
+
             <div class="ask" id="ask" hidden>
               <p class="ask-head">The files are read, but a few columns have names I do not know. Pick the right one for each.</p>
               <div class="ask-list" id="ask-list"></div>
@@ -91,8 +93,9 @@
 
             <div class="run" id="run" hidden>
               <p class="run-stage" id="run-stage" aria-live="polite">Reading the files</p>
+              <p class="run-count" id="run-count" hidden></p>
               <div class="ticks" id="ticks" role="progressbar" aria-label="Progress of the check" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
-              <p class="run-hint">Step <span id="run-step">1</span> of 4. A check takes about a minute. Keep this page open.</p>
+              <p class="run-hint">Step <span id="run-step">1</span> of 4.<span id="run-time"></span> Keep this page open.</p>
             </div>
 
             <div class="problem" id="problem" role="alert" hidden>
@@ -100,6 +103,7 @@
               <div>
                 <p class="problem-text" id="problem-text"></p>
                 <p class="problem-next" id="problem-next"></p>
+                <button class="sample problem-action" id="problem-action" type="button" hidden>See the recorded sample run</button>
               </div>
             </div>
 
@@ -142,6 +146,7 @@
       <h2 id="week-title"><span lang="hi">इस हफ़्ते क्या खत्म होगा</span> <span class="en">What runs out this week</span></h2>
       <div class="stamps">
         <p class="stamp sample-stamp" id="sample-stamp" hidden>Made-up sample items</p>
+        <p class="recorded-note" id="recorded-note" hidden></p>
         <p class="stamp" id="week-stamp">The 7 days after today</p>
       </div>
     </div>
@@ -163,6 +168,7 @@
         </fieldset>
         <div class="say" id="say" aria-live="polite"><p class="say-idle">Add the two reports above, or try the sample, and every item that will run out is written on the day it runs out.</p></div>
         <p class="gemma-off" id="gemma-off" hidden>Gemma is off on this server, so every line is the plain sentence.</p>
+        <p class="gemma-off" id="gemma-limited" hidden>Gemma's free quota is used up right now, so these lines are the plain sentence.</p>
       </div>
     </div>
 
@@ -275,7 +281,7 @@
           <li>The busy-week number is meant to cover about 8 weeks in 10. On the real shop it covered 66 percent.</li>
           <li>Scanned, photographed or handwritten bills are not read.</li>
           <li>Items sold on fewer than 3 days are set aside as too rare to predict.</li>
-          <li>This online demo checks at most <span data-limit="items">40 items</span> per run and files up to <span data-limit="mb">5 MB</span> each. It keeps nothing on disk and forgets results after 30 minutes.</li>
+          <li>This online demo checks at most <span data-limit="items">25 items</span> per run and files up to <span data-limit="mb">5 MB</span> each. It keeps nothing on disk and forgets results after 30 minutes.</li>
           <li>On this site, quantities and dates go to Prior Labs' TabPFN service, and sentences with blanks go to Gemma through Google. Item names go to neither.</li>
           <li>The host sleeps when idle, so the first visit can take about a minute.</li>
         </ul>

@@ -1,0 +1,425 @@
+{
+ "recorded_on": "2026-10-03",
+ "models": {
+  "tabpfn": "TabPFN v2 through Prior Labs' hosted API",
+  "gemma": "gemma-4-26b-a4b-it"
+ },
+ "result": {
+  "shop_name": null,
+  "language": "Hindi",
+  "days_of_sales": 28,
+  "first_day": "2026-09-05",
+  "last_day": "2026-10-02",
+  "items_sold": 10,
+  "stock_items": 10,
+  "items_checked": 10,
+  "notes": [],
+  "plan": [
+   {
+    "item": "Bread",
+    "stock_left": 32,
+    "likely_to_sell": 119,
+    "busy_week": 140,
+    "runs_out_on": "2026-10-04",
+    "runs_out_weekday": "Sunday",
+    "already_out": false,
+    "order_packs": 11,
+    "order_units": 110,
+    "line": "Bread का स्टॉक रविवार तक खत्म हो जाएगा, 11 पैक (110 पीस) ऑर्डर कर लें।",
+    "line_plain": "Bread will run out of stock by Sunday, order 11 packs (110 pieces).",
+    "by_ai": true
+   },
+   {
+    "item": "Colgate 100g",
+    "stock_left": 13,
+    "likely_to_sell": 29,
+    "busy_week": 41,
+    "runs_out_on": "2026-10-06",
+    "runs_out_weekday": "Tuesday",
+    "already_out": false,
+    "order_packs": 3,
+    "order_units": 36,
+    "line": "Colgate 100g का स्टॉक मंगलवार तक खत्म हो जाएगा, 3 पैक (36 पीस) ऑर्डर कर लें।",
+    "line_plain": "Colgate 100g will run out of stock by Tuesday, order 3 packs (36 pieces).",
+    "by_ai": true
+   },
+   {
+    "item": "Maggi 70g",
+    "stock_left": 59,
+    "likely_to_sell": 114,
+    "busy_week": 134,
+    "runs_out_on": "2026-10-06",
+    "runs_out_weekday": "Tuesday",
+    "already_out": false,
+    "order_packs": 4,
+    "order_units": 96,
+    "line": "Maggi 70g का स्टॉक मंगलवार तक खत्म हो जाएगा, 4 पैक (96 पीस) ऑर्डर कर लें।",
+    "line_plain": "Maggi 70g will run out of stock by Tuesday, order 4 packs (96 pieces).",
+    "by_ai": true
+   },
+   {
+    "item": "Surf Excel 1kg",
+    "stock_left": 14,
+    "likely_to_sell": 26,
+    "busy_week": 36,
+    "runs_out_on": "2026-10-06",
+    "runs_out_weekday": "Tuesday",
+    "already_out": false,
+    "order_packs": 4,
+    "order_units": 24,
+    "line": "Surf Excel 1kg का स्टॉक मंगलवार तक खत्म हो जाएगा, 4 पैक (24 पीस) ऑर्डर कर लें।",
+    "line_plain": "Surf Excel 1kg will run out of stock by Tuesday, order 4 packs (24 pieces).",
+    "by_ai": true
+   },
+   {
+    "item": "Coca-Cola 750ml",
+    "stock_left": 43,
+    "likely_to_sell": 72,
+    "busy_week": 87,
+    "runs_out_on": "2026-10-07",
+    "runs_out_weekday": "Wednesday",
+    "already_out": false,
+    "order_packs": 4,
+    "order_units": 48,
+    "line": "Coca-Cola 750ml का स्टॉक बुधवार तक खत्म हो जाएगा, 4 पैक (48 पीस) ऑर्डर कर लें।",
+    "line_plain": "Coca-Cola 750ml will run out of stock by Wednesday, order 4 packs (48 pieces).",
+    "by_ai": true
+   },
+   {
+    "item": "Parle-G",
+    "stock_left": 129,
+    "likely_to_sell": 156,
+    "busy_week": 187,
+    "runs_out_on": "2026-10-08",
+    "runs_out_weekday": "Thursday",
+    "already_out": false,
+    "order_packs": 2,
+    "order_units": 60,
+    "line": "Parle-G का स्टॉक गुरुवार तक खत्म हो जाएगा, 2 पैक (60 पीस) ऑर्डर कर लें।",
+    "line_plain": "Parle-G will run out of stock by Thursday, order 2 packs (60 pieces).",
+    "by_ai": true
+   },
+   {
+    "item": "Lays Classic",
+    "stock_left": 135,
+    "likely_to_sell": 153,
+    "busy_week": 178,
+    "runs_out_on": "2026-10-09",
+    "runs_out_weekday": "Friday",
+    "already_out": false,
+    "order_packs": 2,
+    "order_units": 80,
+    "line": "Lays Classic का स्टॉक शुक्रवार तक खत्म हो जाएगा, 2 पैक (80 पीस) ऑर्डर कर लें।",
+    "line_plain": "Lays Classic will run out of stock by Friday, order 2 packs (80 pieces).",
+    "by_ai": true
+   },
+   {
+    "item": "Tata Salt 1kg",
+    "stock_left": 33,
+    "likely_to_sell": 37,
+    "busy_week": 48,
+    "runs_out_on": "2026-10-09",
+    "runs_out_weekday": "Friday",
+    "already_out": false,
+    "order_packs": 2,
+    "order_units": 20,
+    "line": "Tata Salt 1kg का स्टॉक शुक्रवार तक खत्म हो जाएगा, 2 पैक (20 पीस) ऑर्डर कर लें।",
+    "line_plain": "Tata Salt 1kg will run out of stock by Friday, order 2 packs (20 pieces).",
+    "by_ai": true
+   }
+  ],
+  "worded_by_ai": 8,
+  "enough_stock": [
+   "Aashirvaad Atta 5kg",
+   "Amul Milk 500ml"
+  ],
+  "not_checked": [],
+  "rare_items": [],
+  "capped": null,
+  "honesty": {
+   "tabpfn": {
+    "daily_error": 2.829036327770778,
+    "weekly_error": 6.464311099052429
+   },
+   "plain": {
+    "daily_error": 3.259863945578231,
+    "weekly_error": 6.666666666666673
+   },
+   "same_weekday": {
+    "daily_error": 2.9619047619047616,
+    "weekly_error": 6.666666666666667
+   },
+   "busy_week_covered": 0.8,
+   "per_item": [
+    {
+     "item": "Amul Milk 500ml",
+     "really_sold": 246,
+     "tabpfn": 243,
+     "plain": 243,
+     "same_weekday": 243
+    },
+    {
+     "item": "Lays Classic",
+     "really_sold": 160,
+     "tabpfn": 161,
+     "plain": 150,
+     "same_weekday": 150
+    },
+    {
+     "item": "Parle-G",
+     "really_sold": 160,
+     "tabpfn": 168,
+     "plain": 166,
+     "same_weekday": 166
+    },
+    {
+     "item": "Maggi 70g",
+     "really_sold": 126,
+     "tabpfn": 100,
+     "plain": 107,
+     "same_weekday": 107
+    },
+    {
+     "item": "Bread",
+     "really_sold": 119,
+     "tabpfn": 114,
+     "plain": 113,
+     "same_weekday": 113
+    },
+    {
+     "item": "Coca-Cola 750ml",
+     "really_sold": 80,
+     "tabpfn": 71,
+     "plain": 70,
+     "same_weekday": 70
+    },
+    {
+     "item": "Tata Salt 1kg",
+     "really_sold": 37,
+     "tabpfn": 37,
+     "plain": 37,
+     "same_weekday": 37
+    },
+    {
+     "item": "Colgate 100g",
+     "really_sold": 32,
+     "tabpfn": 24,
+     "plain": 27,
+     "same_weekday": 27
+    },
+    {
+     "item": "Aashirvaad Atta 5kg",
+     "really_sold": 25,
+     "tabpfn": 24,
+     "plain": 24,
+     "same_weekday": 24
+    },
+    {
+     "item": "Surf Excel 1kg",
+     "really_sold": 22,
+     "tabpfn": 25,
+     "plain": 28,
+     "same_weekday": 28
+    }
+   ]
+  },
+  "honesty_problem": null,
+  "gemma_limited": false,
+  "recorded": true,
+  "recorded_on": "2026-10-03"
+ },
+ "notes": {
+  "Hindi": {
+   "lines": [
+    "Bread का स्टॉक रविवार तक खत्म हो जाएगा, 11 पैक (110 पीस) ऑर्डर कर लें।",
+    "Colgate 100g का स्टॉक मंगलवार तक खत्म हो जाएगा, 3 पैक (36 पीस) ऑर्डर कर लें।",
+    "Maggi 70g का स्टॉक मंगलवार तक खत्म हो जाएगा, 4 पैक (96 पीस) ऑर्डर कर लें।",
+    "Surf Excel 1kg का स्टॉक मंगलवार तक खत्म हो जाएगा, 4 पैक (24 पीस) ऑर्डर कर लें।",
+    "Coca-Cola 750ml का स्टॉक बुधवार तक खत्म हो जाएगा, 4 पैक (48 पीस) ऑर्डर कर लें।",
+    "Parle-G का स्टॉक गुरुवार तक खत्म हो जाएगा, 2 पैक (60 पीस) ऑर्डर कर लें।",
+    "Lays Classic का स्टॉक शुक्रवार तक खत्म हो जाएगा, 2 पैक (80 पीस) ऑर्डर कर लें।",
+    "Tata Salt 1kg का स्टॉक शुक्रवार तक खत्म हो जाएगा, 2 पैक (20 पीस) ऑर्डर कर लें।"
+   ],
+   "worded_by_ai": 8,
+   "plan": [
+    {
+     "item": "Bread",
+     "line": "Bread का स्टॉक रविवार तक खत्म हो जाएगा, 11 पैक (110 पीस) ऑर्डर कर लें।",
+     "line_plain": "Bread will run out of stock by Sunday, order 11 packs (110 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Colgate 100g",
+     "line": "Colgate 100g का स्टॉक मंगलवार तक खत्म हो जाएगा, 3 पैक (36 पीस) ऑर्डर कर लें।",
+     "line_plain": "Colgate 100g will run out of stock by Tuesday, order 3 packs (36 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Maggi 70g",
+     "line": "Maggi 70g का स्टॉक मंगलवार तक खत्म हो जाएगा, 4 पैक (96 पीस) ऑर्डर कर लें।",
+     "line_plain": "Maggi 70g will run out of stock by Tuesday, order 4 packs (96 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Surf Excel 1kg",
+     "line": "Surf Excel 1kg का स्टॉक मंगलवार तक खत्म हो जाएगा, 4 पैक (24 पीस) ऑर्डर कर लें।",
+     "line_plain": "Surf Excel 1kg will run out of stock by Tuesday, order 4 packs (24 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Coca-Cola 750ml",
+     "line": "Coca-Cola 750ml का स्टॉक बुधवार तक खत्म हो जाएगा, 4 पैक (48 पीस) ऑर्डर कर लें।",
+     "line_plain": "Coca-Cola 750ml will run out of stock by Wednesday, order 4 packs (48 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Parle-G",
+     "line": "Parle-G का स्टॉक गुरुवार तक खत्म हो जाएगा, 2 पैक (60 पीस) ऑर्डर कर लें।",
+     "line_plain": "Parle-G will run out of stock by Thursday, order 2 packs (60 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Lays Classic",
+     "line": "Lays Classic का स्टॉक शुक्रवार तक खत्म हो जाएगा, 2 पैक (80 पीस) ऑर्डर कर लें।",
+     "line_plain": "Lays Classic will run out of stock by Friday, order 2 packs (80 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Tata Salt 1kg",
+     "line": "Tata Salt 1kg का स्टॉक शुक्रवार तक खत्म हो जाएगा, 2 पैक (20 पीस) ऑर्डर कर लें।",
+     "line_plain": "Tata Salt 1kg will run out of stock by Friday, order 2 packs (20 pieces).",
+     "by_ai": true
+    }
+   ],
+   "gemma_limited": false
+  },
+  "English": {
+   "lines": [
+    "Bread will finish by Sunday, please order 11 packs (110 pieces).",
+    "Colgate 100g will finish by Tuesday, please order 3 packs (36 pieces).",
+    "Maggi 70g will finish by Tuesday, please order 4 packs (96 pieces).",
+    "Surf Excel 1kg will finish by Tuesday, please order 4 packs (24 pieces).",
+    "Coca-Cola 750ml will finish by Wednesday, please order 4 packs (48 pieces).",
+    "Parle-G will run out of stock by Thursday, order 2 packs (60 pieces).",
+    "Lays Classic will finish by Friday, please order 2 packs (80 pieces).",
+    "Tata Salt 1kg will finish by Friday, please order 2 packs (20 pieces)."
+   ],
+   "worded_by_ai": 7,
+   "plan": [
+    {
+     "item": "Bread",
+     "line": "Bread will finish by Sunday, please order 11 packs (110 pieces).",
+     "line_plain": "Bread will run out of stock by Sunday, order 11 packs (110 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Colgate 100g",
+     "line": "Colgate 100g will finish by Tuesday, please order 3 packs (36 pieces).",
+     "line_plain": "Colgate 100g will run out of stock by Tuesday, order 3 packs (36 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Maggi 70g",
+     "line": "Maggi 70g will finish by Tuesday, please order 4 packs (96 pieces).",
+     "line_plain": "Maggi 70g will run out of stock by Tuesday, order 4 packs (96 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Surf Excel 1kg",
+     "line": "Surf Excel 1kg will finish by Tuesday, please order 4 packs (24 pieces).",
+     "line_plain": "Surf Excel 1kg will run out of stock by Tuesday, order 4 packs (24 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Coca-Cola 750ml",
+     "line": "Coca-Cola 750ml will finish by Wednesday, please order 4 packs (48 pieces).",
+     "line_plain": "Coca-Cola 750ml will run out of stock by Wednesday, order 4 packs (48 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Parle-G",
+     "line": "Parle-G will run out of stock by Thursday, order 2 packs (60 pieces).",
+     "line_plain": "Parle-G will run out of stock by Thursday, order 2 packs (60 pieces).",
+     "by_ai": false
+    },
+    {
+     "item": "Lays Classic",
+     "line": "Lays Classic will finish by Friday, please order 2 packs (80 pieces).",
+     "line_plain": "Lays Classic will run out of stock by Friday, order 2 packs (80 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Tata Salt 1kg",
+     "line": "Tata Salt 1kg will finish by Friday, please order 2 packs (20 pieces).",
+     "line_plain": "Tata Salt 1kg will run out of stock by Friday, order 2 packs (20 pieces).",
+     "by_ai": true
+    }
+   ],
+   "gemma_limited": false
+  },
+  "Hinglish": {
+   "lines": [
+    "Bread ka stock Sunday tak khatam ho jayega, 11 packs (110 pieces) order kar lo.",
+    "Colgate 100g ka stock Tuesday tak khatam ho jayega, 3 packs (36 pieces) order kar lo.",
+    "Maggi 70g ka stock Tuesday tak khatam ho jayega, 4 packs (96 pieces) order kar lo.",
+    "Surf Excel 1kg ka stock Tuesday tak khatam ho jayega, 4 packs (24 pieces) order kar lo.",
+    "Coca-Cola 750ml ka stock Wednesday tak khatam ho jayega, 4 packs (48 pieces) order kar lo.",
+    "Parle-G ka stock Thursday tak khatam ho jayega, 2 packs (60 pieces) order kar lo.",
+    "Lays Classic ka stock Friday tak khatam ho jayega, 2 packs (80 pieces) order kar lo.",
+    "Tata Salt 1kg will run out of stock by Friday, order 2 packs (20 pieces)."
+   ],
+   "worded_by_ai": 7,
+   "plan": [
+    {
+     "item": "Bread",
+     "line": "Bread ka stock Sunday tak khatam ho jayega, 11 packs (110 pieces) order kar lo.",
+     "line_plain": "Bread will run out of stock by Sunday, order 11 packs (110 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Colgate 100g",
+     "line": "Colgate 100g ka stock Tuesday tak khatam ho jayega, 3 packs (36 pieces) order kar lo.",
+     "line_plain": "Colgate 100g will run out of stock by Tuesday, order 3 packs (36 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Maggi 70g",
+     "line": "Maggi 70g ka stock Tuesday tak khatam ho jayega, 4 packs (96 pieces) order kar lo.",
+     "line_plain": "Maggi 70g will run out of stock by Tuesday, order 4 packs (96 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Surf Excel 1kg",
+     "line": "Surf Excel 1kg ka stock Tuesday tak khatam ho jayega, 4 packs (24 pieces) order kar lo.",
+     "line_plain": "Surf Excel 1kg will run out of stock by Tuesday, order 4 packs (24 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Coca-Cola 750ml",
+     "line": "Coca-Cola 750ml ka stock Wednesday tak khatam ho jayega, 4 packs (48 pieces) order kar lo.",
+     "line_plain": "Coca-Cola 750ml will run out of stock by Wednesday, order 4 packs (48 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Parle-G",
+     "line": "Parle-G ka stock Thursday tak khatam ho jayega, 2 packs (60 pieces) order kar lo.",
+     "line_plain": "Parle-G will run out of stock by Thursday, order 2 packs (60 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Lays Classic",
+     "line": "Lays Classic ka stock Friday tak khatam ho jayega, 2 packs (80 pieces) order kar lo.",
+     "line_plain": "Lays Classic will run out of stock by Friday, order 2 packs (80 pieces).",
+     "by_ai": true
+    },
+    {
+     "item": "Tata Salt 1kg",
+     "line": "Tata Salt 1kg will run out of stock by Friday, order 2 packs (20 pieces).",
+     "line_plain": "Tata Salt 1kg will run out of stock by Friday, order 2 packs (20 pieces).",
+     "by_ai": false
+    }
+   ],
+   "gemma_limited": false
+  }
+ }
+}

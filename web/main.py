@@ -13,20 +13,24 @@ from web.config import FILE_TYPES, Settings
 from web.controllers import checks, meta, orders, samples
 from web.repositories.forecasting import ForecastingGateway
 from web.repositories.jobs import JobStore
+from web.repositories.quota import CreditMeter, utc_now
 from web.repositories.samples import SampleRepository
 from web.repositories.uploads import FileRepository
 from web.repositories.wording import WordingGateway
 from web.services.honesty import HonestyService
 from web.services.orders import OrderService
 from web.services.problems import Problem
+from web.services.quota import QuotaService
 from web.services.stock_check import StockCheckService
 from web.services.wording import WordingService
 
 VIEWS = Path(__file__).parent / "views"
 
 
-def create_app(settings: Settings | None = None, make_forecaster=None, ask_gemma=None, clock=None) -> FastAPI:
-    """make_forecaster and ask_gemma replace the two models, for tests."""
+def create_app(settings: Settings | None = None, make_forecaster=None, ask_gemma=None, clock=None, read_usage=None,
+               now=None, sample_repository: SampleRepository | None = None) -> FastAPI:
+    """make_forecaster and ask_gemma replace the two models, read_usage prior labs' usage sentence and now the utc
+    clock, for tests."""
     settings = settings or Settings.from_env()
 
     @asynccontextmanager
@@ -41,12 +45,17 @@ def create_app(settings: Settings | None = None, make_forecaster=None, ask_gemma
     state.forecasting = ForecastingGateway(settings.tabpfn_backend, settings.tabpfn_token, settings.forecast_workers,
                                            make_forecaster)
     state.wording_gateway = WordingGateway(settings.gemma_backend, settings.gemma_api_key, settings.gemma_model, ask_gemma)
-    state.samples = SampleRepository()
+    state.samples = sample_repository or SampleRepository()
+    if read_usage is None and make_forecaster is None and state.forecasting.status() == "api":
+        read_usage = state.forecasting.usage_text
+    meter = CreditMeter(read_usage, now or utc_now)
+    # only prior labs' hosted model spends credits
+    state.quota = QuotaService(settings, meter, counts=settings.tabpfn_backend == "api")
     jobs = JobStore(settings.job_minutes * 60, **({"clock": clock} if clock else {}))
     state.jobs = jobs
     state.checks = StockCheckService(settings, FileRepository(FILE_TYPES, settings.max_upload_mb), state.samples, jobs,
                                      state.forecasting, WordingService(state.wording_gateway),
-                                     HonestyService(settings.run_honesty, settings.horizon_days))
+                                     HonestyService(settings.run_honesty, settings.horizon_days), state.quota)
     state.orders = OrderService()
 
     # two files at the cap plus the form fields. uploads stay in memory: the spool only goes to disk past this size

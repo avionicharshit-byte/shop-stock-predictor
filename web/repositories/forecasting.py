@@ -55,6 +55,12 @@ class ForecastingGateway:
         thread.start()
         return thread
 
+    def usage_text(self) -> str:
+        """Prior Labs' sentence on the credits used this month. A free read, it spends no credits."""
+        self._set_token()
+        import tabpfn_client
+        return tabpfn_client.get_api_usage()
+
     def provider(self):
         if self.make_provider is not None:
             return self.make_provider()

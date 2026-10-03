@@ -43,9 +43,12 @@ def echo_gemma(prompt: str) -> str:
 
 
 def make_client(make_forecaster=FakeTabPFN, ask_gemma=echo_gemma, **settings) -> TestClient:
+    # the sample runs live through the stand-in models here, unless a test asks for the recorded run
     base = {"gemma_backend": "google", "tabpfn_token": None, "checks_per_hour": 100, "running_per_ip": 10,
-            "running_total": 10}
-    app = create_app(Settings(**{**base, **settings}), make_forecaster=make_forecaster, ask_gemma=ask_gemma)
+            "running_total": 10, "recorded_sample": False}
+    app_options = {name: settings.pop(name) for name in ("read_usage", "now", "sample_repository") if name in settings}
+    app = create_app(Settings(**{**base, **settings}), make_forecaster=make_forecaster, ask_gemma=ask_gemma,
+                     **app_options)
     return TestClient(app)
 
 

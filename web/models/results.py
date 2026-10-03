@@ -53,6 +53,7 @@ class HonestyResult(BaseModel):
 class Capped(BaseModel):
     kept: int
     dropped: int
+    text: str = ""  # what the cap did, in plain words for the page
 
 
 class StockCheckResult(BaseModel):
@@ -73,6 +74,9 @@ class StockCheckResult(BaseModel):
     capped: Capped | None
     honesty: HonestyResult | None
     honesty_problem: str | None
+    gemma_limited: bool = False  # every line fell back because gemma's free quota was used up
+    recorded: bool = False  # answered from a saved run of the sample, not run now
+    recorded_on: date | None = None
 
 
 class JobStatus(BaseModel):
@@ -81,6 +85,12 @@ class JobStatus(BaseModel):
     progress: float
     result: StockCheckResult | None
     problem: str | None
+    quota: bool = False  # it failed because a free quota ran out
+    items: int = 0  # items the model looks at
+    predicted: int = 0
+    tested: int = 0
+    eta_seconds: int | None = None  # model time left, None until a few calls are timed
+    estimate_seconds: int | None = None  # model time for all the items
 
 
 class NoteLine(BaseModel):
@@ -95,6 +105,7 @@ class NoteResult(BaseModel):
     lines: list[str]
     worded_by_ai: int
     plan: list[NoteLine]  # per line, in plan order, so the client can mark which ones Gemma worded
+    gemma_limited: bool = False
 
 
 class Limits(BaseModel):
@@ -103,8 +114,23 @@ class Limits(BaseModel):
     horizon_days: int
 
 
+class Quota(BaseModel):
+    live_checks_left_today: int | None  # sample-sized live checks the budget still allows, None when unknown
+    resets: str | None  # utc time the binding limit resets, iso 8601
+
+
 class AppConfig(BaseModel):
     tabpfn: Literal["api", "local", "off"]
     gemma: Literal["google", "ollama", "off"]
     languages: list[str]
     limits: Limits
+    quota: Quota | None  # None when checks cost no credits
+    recorded_sample: bool  # the sample answers from a saved run
+
+
+class RecordedSample(BaseModel):
+    """One real run of the sample, saved so visitors can see it without spending any quota."""
+    recorded_on: date
+    models: dict[str, str]
+    result: StockCheckResult
+    notes: dict[str, NoteResult]  # language -> the note, every language
